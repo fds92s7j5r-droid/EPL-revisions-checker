@@ -4,529 +4,273 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1117">
-<title>Engineer Pay Log — Crew Book Revision Builder Prototype 3</title>
+<title>Engineer Pay Log — Crew Book Revision Builder</title>
 <style>
 :root{
-  --bg:#0b1117;--panel:#111a22;--panel2:#16222c;--panel3:#0d151c;
-  --text:#f5f7f9;--muted:#9ba8b4;--line:#2d3c49;
-  --green:#55cc7a;--green2:#173821;--blue:#69b6ff;--blue2:#12283a;
-  --amber:#e8ba63;--amber2:#332916;--red:#ee7777;--red2:#3a2022;--input:#0b141b;
+ --bg:#0b1117;--panel:#111a22;--panel2:#16222c;--panel3:#0d151c;--input:#0b141b;
+ --text:#f5f7f9;--muted:#9aa8b5;--line:#2c3b48;--green:#55cc7a;--green2:#173821;
+ --blue:#69b6ff;--blue2:#12283a;--amber:#e8ba63;--amber2:#332916;--red:#ee7777;--red2:#3a2022
 }
 *{box-sizing:border-box}
 html{background:var(--bg)}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
-.wrap{max-width:850px;margin:0 auto;padding:14px 11px 126px}
+.wrap{max-width:900px;margin:0 auto;padding:14px 11px 130px}
 .hero,.card,.sticky,.general,.preview{border:1px solid var(--line);background:var(--panel);border-radius:18px}
 .hero{padding:18px;margin-bottom:12px}
 .eyebrow{font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--green)}
 h1{font-size:24px;line-height:1.15;margin:7px 0 8px}
 .hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
 .demo{margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid #355c40;background:#15281b;color:#c9f1d3;font-size:12px;font-weight:800}
-.sticky{position:sticky;top:6px;z-index:20;margin-bottom:10px;padding:11px;background:rgba(11,17,23,.94);backdrop-filter:blur(12px)}
-.row{display:flex;align-items:center;gap:8px}
-.space{justify-content:space-between}
-.progress{height:8px;background:#202c36;border-radius:999px;overflow:hidden;margin-top:8px}
-.progress>div{height:100%;width:0;background:var(--green);transition:.2s}
+.sticky{position:sticky;top:6px;z-index:40;margin-bottom:10px;padding:11px;background:rgba(11,17,23,.94);backdrop-filter:blur(12px)}
+.row{display:flex;align-items:center;gap:8px}.space{justify-content:space-between}
+.progress{height:8px;background:#202c36;border-radius:999px;overflow:hidden;margin-top:8px}.progress>div{height:100%;width:0;background:var(--green)}
 .small{font-size:12px;color:var(--muted)}
-.tabs{display:flex;gap:7px;overflow:auto;scrollbar-width:none;padding:2px 0 9px}
-.tabs::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:7px;overflow:auto;scrollbar-width:none;padding:2px 0 9px}.tabs::-webkit-scrollbar{display:none}
 .tab{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:9px 11px;border-radius:999px;font-size:12px;font-weight:850;white-space:nowrap}
 .tab.active{border-color:var(--green);background:var(--green2);color:#d8ffe2}
 .general{padding:14px;margin-bottom:10px}
-.card{margin:10px 0;overflow:hidden}
-.card.done{border-color:#315c3e}
+.card{margin:10px 0;overflow:visible}.card.done{border-color:#315c3e}
 .cardhead{padding:13px;display:flex;gap:10px;align-items:center;cursor:pointer;user-select:none}
 .badge{min-width:68px;text-align:center;padding:8px 10px;border-radius:11px;background:var(--panel3);border:1px solid var(--line);font-weight:900}
-.meta{flex:1;min-width:0}
-.meta strong{display:block;font-size:15px}
-.meta small{display:block;color:var(--muted);margin-top:3px}
-.status{font-size:11px;font-weight:900;padding:6px 9px;border-radius:999px;background:#25323d;color:#b9c3cc}
-.done .status{background:var(--green2);color:#c9f7d4}
+.meta{flex:1;min-width:0}.meta strong{display:block;font-size:15px}.meta small{display:block;color:var(--muted);margin-top:3px}
+.status{font-size:11px;font-weight:900;padding:6px 9px;border-radius:999px;background:#25323d;color:#b9c3cc}.done .status{background:var(--green2);color:#c9f7d4}
 .chev{font-size:19px;color:var(--muted)}
-.body{display:none;border-top:1px solid var(--line);padding:13px}
-.card.open .body{display:block}
+.body{display:none;border-top:1px solid var(--line);padding:13px}.card.open .body{display:block}
 .section{margin:14px 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:900}
 label.lbl{display:block;font-size:12px;color:var(--muted);font-weight:850;margin:0 0 5px}
 input,select,textarea{width:100%;background:var(--input);color:var(--text);border:1px solid #324350;border-radius:10px;padding:10px 11px;font:inherit;outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--green)}
-textarea{min-height:78px;resize:vertical}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+input:focus,select:focus,textarea:focus{border-color:var(--green)} textarea{min-height:78px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .block{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:11px;margin:8px 0}
-.readonly{background:#0b1218}
-.readonly summary{cursor:pointer;font-size:12px;font-weight:900;color:#c8d0d7}
-.readonly pre{white-space:pre-wrap;word-break:break-word;margin:9px 0 0;color:#aebbc5;font-size:11px;line-height:1.45}
 .coverage{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.btnrow{display:flex;gap:8px;margin-top:9px}
 button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:850;cursor:pointer}
-.primary{background:var(--green);color:#07140b}
-.secondary{background:#263641;color:var(--text);border:1px solid #3a4a56}
-.bluebtn{background:#18334a;color:#d8ecff;border:1px solid #335c7c}
-.warnbtn{background:#3a2b18;color:#ffdba0;border:1px solid #674a22}
-.dangerbtn{background:var(--red2);color:#ffc1c1;border:1px solid #673638}
-.smallbtn{padding:8px 10px;font-size:12px}
-.btnrow button{flex:1}
+.primary{background:var(--green);color:#07140b}.secondary{background:#263641;color:var(--text);border:1px solid #3a4a56}
+.bluebtn{background:#18334a;color:#d8ecff;border:1px solid #335c7c}.warnbtn{background:#3a2b18;color:#ffdba0;border:1px solid #674a22}
+.dangerbtn{background:var(--red2);color:#ffc1c1;border:1px solid #673638}.smallbtn{padding:8px 10px;font-size:12px}
+.btnrow{display:flex;gap:8px;margin-top:9px}.btnrow button{flex:1}
 .note{border:1px solid #6b5629;background:var(--amber2);color:#f0d39a;border-radius:11px;padding:9px 10px;font-size:12px;line-height:1.4;margin-top:8px}
-.diff{border:1px solid #345d77;background:#102433;border-radius:11px;padding:10px;margin-top:10px}
-.diff strong{color:#bfe2ff}
-.diff ul{margin:7px 0 0;padding-left:18px;color:#d5e8f6;font-size:12px;line-height:1.5}
-.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.daycell{min-width:0}
-.daycell label{display:block;font-size:10px;color:var(--muted);font-weight:900;margin-bottom:4px;text-align:center}
-.daycell input{text-align:center;padding:9px 4px}
-.exception{background:#101920;border:1px dashed #425361;border-radius:12px;padding:10px;margin:8px 0}
-.exception .xrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.daycell{min-width:0}.daycell label{display:block;font-size:10px;color:var(--muted);font-weight:900;margin-bottom:4px;text-align:center}.daycell input{text-align:center;padding:9px 4px}
+.exception{background:#101920;border:1px dashed #425361;border-radius:12px;padding:10px;margin:8px 0}.exception .xrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* pinned source viewer */
+.sourceDock{position:sticky;top:67px;z-index:30;background:#0a1015;border:1px solid #3b4d5b;border-radius:15px;margin:0 0 12px;box-shadow:0 10px 28px rgba(0,0,0,.35);overflow:hidden}
+.sourceDock.collapsed .sourceViewport,.sourceDock.collapsed .verifyStrip{display:none}
+.sourceBar{display:flex;align-items:center;gap:7px;padding:8px;background:#131f28;border-bottom:1px solid #2d3e4b}
+.sourceBar strong{font-size:12px;flex:1}
+.sourceBar button{padding:7px 9px;font-size:11px}
+.sourceViewport{height:34vh;min-height:190px;max-height:360px;overflow:auto;background:#edf0f2;touch-action:pan-x pan-y}
+.sourceViewport img{display:block;width:100%;height:auto;transform-origin:top left}
+.sourceHint{font-size:10px;color:#9eabb5;padding:5px 8px;background:#111a22}
+.verifyStrip{padding:8px;background:#101820;border-top:1px solid #293945}
+.verifyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.vcheck{display:flex;align-items:center;gap:6px;border:1px solid #334651;background:#16222b;padding:7px;border-radius:9px;font-size:10px;font-weight:800}
+.vcheck input{width:17px;height:17px;accent-color:var(--green)}
+.noSource{padding:18px;text-align:center;color:#8f9da7;font-size:12px}
 
 /* movement builder */
 .movement-shell{background:#101920;border:1px solid #344651;border-radius:13px;padding:10px;margin-top:8px}
-.movement-tools{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:8px}
-.movement-tools button{padding:9px 7px;font-size:12px}
+.movement-tools{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:8px}.movement-tools button{padding:9px 7px;font-size:12px}
 .movement{border:1px solid #334754;background:#0c151c;border-radius:13px;margin:9px 0;overflow:hidden}
-.movehead{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid #293945}
-.moveindex{width:26px;height:26px;border-radius:999px;display:grid;place-items:center;background:#24333e;color:#d8e1e8;font-size:11px;font-weight:900}
-.movetype{font-size:12px;font-weight:900;flex:1}
-.train .movetype{color:#bde1ff}
-.deadhead .movetype{color:#d7f8df}
-.movebody{padding:10px}
-.moveactions{display:flex;gap:6px}
-.moveactions button{padding:6px 8px;font-size:11px;min-width:34px}
-.summaryline{font-size:12px;color:#cfd7dd;line-height:1.45;background:#111d25;border:1px solid #2b3e4b;border-radius:9px;padding:8px;margin-top:8px}
+.movehead{display:flex;align-items:center;gap:7px;padding:9px 10px;border-bottom:1px solid #293945}
+.moveindex{width:25px;height:25px;border-radius:999px;display:grid;place-items:center;background:#24333e;font-size:11px;font-weight:900}
+.kindpill{font-size:9px;border-radius:999px;padding:4px 7px;font-weight:900;border:1px solid #385064;background:#172531}.kindpill.dh{border-color:#395744;background:#17281d}.kindpill.note{border-color:#66552e;background:#292316}
+.movetype{font-size:11px;font-weight:850;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.movebody{padding:10px}.moveactions{display:flex;gap:4px}.moveactions button{padding:6px 7px;font-size:10px}
 .empty{padding:13px;border:1px dashed #3e4e5b;border-radius:10px;color:#8f9da8;text-align:center;font-size:12px}
-.kindpill{font-size:10px;border-radius:999px;padding:4px 7px;font-weight:900;border:1px solid #385064;background:#172531}
-.kindpill.dh{border-color:#395744;background:#17281d}
-.kindpill.note{border-color:#66552e;background:#292316}
-.footer{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(9,14,19,.97);border-top:1px solid var(--line);padding:9px max(11px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(11px,env(safe-area-inset-left))}
-.footerin{max-width:850px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
-.footer button{padding:11px 7px;font-size:12px}
+
+.footer{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(9,14,19,.97);border-top:1px solid var(--line);padding:9px max(11px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(11px,env(safe-area-inset-left))}
+.footerin{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.footer button{padding:11px 7px;font-size:12px}
+.preview{padding:12px;margin-top:12px}.preview summary{cursor:pointer;font-weight:900}.preview pre{white-space:pre-wrap;word-break:break-word;background:#081017;border:1px solid #263743;border-radius:10px;padding:10px;max-height:330px;overflow:auto;font-size:10.5px;color:#cce4d3}
+.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%);z-index:60;opacity:0;pointer-events:none;transition:.18s;background:#eaf8ee;color:#13341c;padding:9px 13px;border-radius:999px;font-size:12px;font-weight:900;white-space:nowrap}.toast.show{opacity:1}
 .hidden{display:none!important}
-.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%);z-index:50;opacity:0;pointer-events:none;transition:.18s;background:#eaf8ee;color:#13341c;padding:9px 13px;border-radius:999px;font-size:12px;font-weight:900;white-space:nowrap}
-.toast.show{opacity:1}
-.preview{padding:12px;margin-top:12px}
-.preview summary{cursor:pointer;font-weight:900}
-.preview pre{white-space:pre-wrap;word-break:break-word;background:#081017;border:1px solid #263743;border-radius:10px;padding:10px;max-height:330px;overflow:auto;font-size:10.5px;color:#cce4d3}
+@media(min-width:760px){
+ .card.open .body.regularLayout{display:grid;grid-template-columns:minmax(300px,42%) 1fr;gap:12px;align-items:start}
+ .card.open .body.regularLayout .sourceDock{top:67px}
+ .card.open .body.regularLayout .editorPane{min-width:0}
+ .sourceViewport{height:65vh;max-height:680px}
+}
 @media(max-width:600px){
-  .grid2,.grid3,.coverage,.exception .xrow{grid-template-columns:1fr}
-  .week{grid-template-columns:repeat(4,1fr)}
-  .movement-tools{grid-template-columns:1fr}
+ .grid2,.grid3,.coverage,.exception .xrow{grid-template-columns:1fr}
+ .week{grid-template-columns:repeat(4,1fr)}
+ .movement-tools{grid-template-columns:1fr}
+ .verifyGrid{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <section class="hero">
-    <div class="eyebrow">Engineer Pay Log • Prototype 3</div>
-    <h1>Crew Book Revision Builder</h1>
-    <p>Full-assignment transcription with a Time-Slip-style movement builder. Enter each train, deadhead, or note as its own line and preserve the exact order shown in the Crew Book.</p>
-    <div class="demo">STANDALONE PROTOTYPE — nothing here changes Engineer Pay Log or production data.</div>
-  </section>
+<section class="hero">
+ <div class="eyebrow">Engineer Pay Log • Revision Tool</div>
+ <h1>Crew Book Revision Builder</h1>
+ <p>Designed for one-phone Crew Book revisions: keep the scanned assignment pinned while you transcribe and verify the new assignment below it.</p>
+ <div class="demo">DEMO DATA ONLY — the included Job 277 scan is a source-viewer example. This tool does not modify Engineer Pay Log.</div>
+</section>
 
-  <section class="sticky">
-    <div class="row space">
-      <strong id="progressText">0 of 5 complete</strong>
-      <span class="small" id="saveText">Autosaves locally</span>
-    </div>
-    <div class="progress"><div id="progressBar"></div></div>
-  </section>
+<section class="sticky">
+ <div class="row space"><strong id="progressText">0 of 5 complete</strong><span class="small" id="saveText">Autosaves locally</span></div>
+ <div class="progress"><div id="progressBar"></div></div>
+</section>
 
-  <div class="tabs">
-    <button class="tab active" data-tab="all">All</button>
-    <button class="tab" data-tab="regular">Regular Crews</button>
-    <button class="tab" data-tab="extra">Extra Crews</button>
-    <button class="tab" data-tab="relief">Relief Crews</button>
-    <button class="tab" data-tab="added">Added</button>
-    <button class="tab" data-tab="abolished">Abolished</button>
-    <button class="tab" data-tab="unfinished">Unfinished</button>
-  </div>
-
-  <section class="general">
-    <div class="section" style="margin-top:0">Revision information</div>
-    <div class="grid3">
-      <div><label class="lbl">General Order</label><input id="go" value="202" oninput="setRevision('go',this.value)"></div>
-      <div><label class="lbl">Revision</label><input id="rev" value="7" oninput="setRevision('revision',this.value)"></div>
-      <div><label class="lbl">Effective date</label><input id="eff" type="date" value="2026-09-08" oninput="setRevision('effective',this.value)"></div>
-    </div>
-    <div style="margin-top:10px">
-      <label class="lbl">General revision notes for review</label>
-      <textarea id="generalNotes" placeholder="Anything about this revision you want me to know before I review the JSON…" oninput="setGeneralNotes(this.value)"></textarea>
-    </div>
-  </section>
-
-  <main id="cards"></main>
-
-  <details class="preview">
-    <summary>Preview JSON backup / handoff file</summary>
-    <pre id="preview"></pre>
-  </details>
+<div class="tabs">
+ <button class="tab active" data-tab="all">All</button>
+ <button class="tab" data-tab="regular">Regular Crews</button>
+ <button class="tab" data-tab="extra">Extra Crews</button>
+ <button class="tab" data-tab="relief">Relief Crews</button>
+ <button class="tab" data-tab="added">Added</button>
+ <button class="tab" data-tab="abolished">Abolished</button>
+ <button class="tab" data-tab="unfinished">Unfinished</button>
 </div>
 
-<div class="footer">
-  <div class="footerin">
-    <button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
-    <button class="primary" onclick="exportJson()">Export JSON</button>
-    <button class="dangerbtn" onclick="resetDemo()">Reset</button>
-  </div>
+<section class="general">
+ <div class="section" style="margin-top:0">Revision information</div>
+ <div class="grid3">
+  <div><label class="lbl">General Order</label><input id="go" value="202" oninput="setRevision('go',this.value)"></div>
+  <div><label class="lbl">Revision</label><input id="rev" value="7" oninput="setRevision('revision',this.value)"></div>
+  <div><label class="lbl">Effective date</label><input id="eff" type="date" value="2026-09-08" oninput="setRevision('effective',this.value)"></div>
+ </div>
+ <div style="margin-top:10px"><label class="lbl">General revision notes for review</label><textarea id="generalNotes" placeholder="Anything you want me to know about the revision as a whole…" oninput="setGeneralNotes(this.value)"></textarea></div>
+</section>
+
+<main id="cards"></main>
+<details class="preview"><summary>Preview JSON backup / handoff file</summary><pre id="preview"></pre></details>
 </div>
+
+<div class="footer"><div class="footerin">
+ <button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
+ <button class="primary" onclick="exportJson()">Export JSON</button>
+ <button class="dangerbtn" onclick="resetDemo()">Reset</button>
+</div></div>
 <input id="importFile" type="file" accept=".json,application/json" class="hidden" onchange="importJson(this.files[0])">
 <div id="toast" class="toast">Saved</div>
 
 <script>
-const KEY='eplCrewRevisionBuilderPrototype3';
-
-const PRIOR={
- "277":{
-   terminal:"Babylon Yard",
-   relief1:{day:"Wednesday",coverType:"job",coverJob:"474"},
-   relief2:{day:"Thursday",coverType:"job",coverJob:"474"},
-   paysMeal:"no",
-   weekday:{report:"18:21",release:"02:29",movements:[]},
-   weekend:{report:"18:21",release:"02:19",movements:[]},
-   notes:"Previous verified assignment sample."
- },
- "61":{
-   terminal:"Jamaica Storage Yard",active:"Mondays",report:"01:46",release:"06:57",
-   movements:[
-     {type:"train",train:"3032",from:"Jamaica",depart:"02:16",to:"Speonk",arrive:"03:50"},
-     {type:"deadhead",from:"Speonk",depart:"",to:"Jamaica",arrive:""}
-   ]
- },
- "474":{
-   terminal:"Babylon Yard",week:{Mon:"277",Tue:"R",Wed:"R",Thu:"200",Fri:"200",Sat:"271",Sun:"271"}
- }
-};
+const KEY="eplCrewRevisionBuilderKeeper_v1";
+const SOURCE_IMAGES={"277":"assets/job277_source.png"};
+const VERIFY_LABELS=[["report","Report"],["relief","Relief coverage"],["weekday","Mon–Fri lines"],["weekend","Sat–Sun lines"],["exceptions","Exceptions"],["footnotes","Footnotes"]];
 
 function movement(type){
- if(type==="train") return {type:"train",train:"",from:"",depart:"",to:"",arrive:"",note:""};
- if(type==="deadhead") return {type:"deadhead",from:"",depart:"",to:"",arrive:"",note:""};
- return {type:"note",text:""};
+ if(type==="train")return{type:"train",train:"",from:"",depart:"",to:"",arrive:"",note:""};
+ if(type==="deadhead")return{type:"deadhead",from:"",depart:"",to:"",arrive:"",note:""};
+ return{type:"note",text:""};
 }
-function blankCoverage(){return {day:"",coverType:"extra",coverJob:""}}
-function blankPeriod(){return {report:"",release:"",movements:[],exceptions:[]}}
-function regular(crew,action="revised"){
- return {id:"regular-"+crew,type:"regular",crew,action,complete:false,terminal:"",
- relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",
- weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:""};
-}
-function extra(crew){
- return {id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,terminal:"",
- active:"",report:"",release:"",movements:[],footnotes:"",notes:""};
-}
-function relief(crew){
- return {id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,terminal:"",
- week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:""};
-}
-function abolished(crew){return {id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,notes:""}}
+function blankCoverage(){return{day:"",coverType:"extra",coverJob:""}}
+function blankPeriod(){return{report:"",release:"",movements:[],exceptions:[]}}
+function verifyBlank(){return{report:false,relief:false,weekday:false,weekend:false,exceptions:false,footnotes:false}}
+function regular(crew,action="revised"){return{id:"regular-"+crew,type:"regular",crew,action,complete:false,terminal:"",relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:"",verified:verifyBlank()}}
+function extra(crew){return{id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,terminal:"",active:"",report:"",release:"",movements:[],footnotes:"",notes:"",verified:{report:false,weekday:false,footnotes:false}}}
+function relief(crew){return{id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,terminal:"",week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:"",verified:{relief:false}}}
+function abolished(crew){return{id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,notes:"",verified:{}}}
 
 function fresh(){
- const a=regular("277");
- a.terminal="Babylon Yard";
- a.relief1={day:"Wednesday",coverType:"job",coverJob:"474"};
- a.relief2={day:"Thursday",coverType:"job",coverJob:"474"};
- a.paysMeal="no";
- const b=regular("203","added");
- const c=extra("61");
- const d=relief("474");d.terminal="Babylon Yard";
- const e=abolished("18");
- return {schema:"epl-crew-revision-builder-v3",
- revision:{go:"202",revision:"7",effective:"2026-09-08",generalNotes:""},
- items:[a,b,c,d,e]};
+ const a=regular("277"); a.terminal="Babylon Yard";
+ a.relief1={day:"Monday",coverType:"job",coverJob:"474"}; a.relief2={day:"Tuesday",coverType:"extra",coverJob:""}; a.paysMeal="no";
+ const b=regular("203","added"),c=extra("61"),d=relief("474");d.terminal="Babylon Yard";
+ return{schema:"epl-crew-revision-builder-keeper-v1",revision:{go:"202",revision:"7",effective:"2026-09-08",generalNotes:""},items:[a,b,c,d,abolished("18")]}
 }
-let state=load(),currentTab="all";
-
+let state=load(),currentTab="all",sourceUI={};
 function load(){try{const x=localStorage.getItem(KEY);if(x)return JSON.parse(x)}catch(e){}return fresh()}
-function save(show=false){
- localStorage.setItem(KEY,JSON.stringify(state));
- document.getElementById("saveText").textContent='Saved • '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
- updateProgress();updatePreview();if(show)toast("Saved")
-}
+function save(show=false){localStorage.setItem(KEY,JSON.stringify(state));document.getElementById("saveText").textContent='Saved • '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});updateProgress();updatePreview();if(show)toast("Saved")}
 function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function visible(i){
- if(currentTab==="all")return true;
- if(currentTab==="unfinished")return !i.complete;
- if(currentTab==="added")return i.action==="added";
- if(currentTab==="abolished")return i.action==="abolished";
- return i.type===currentTab && !["added","abolished"].includes(i.action);
-}
-function title(i){
- if(i.type==="regular") return i.action==="added"?"Added Regular Crew":i.action==="abolished"?"Abolished Regular Crew":"Regular Crew";
- if(i.type==="extra")return"Extra Crew";return"Relief Crew"
-}
+function visible(i){if(currentTab==="all")return true;if(currentTab==="unfinished")return!i.complete;if(currentTab==="added")return i.action==="added";if(currentTab==="abolished")return i.action==="abolished";return i.type===currentTab&&!["added","abolished"].includes(i.action)}
+function title(i){if(i.type==="regular")return i.action==="added"?"Added Regular Crew":i.action==="abolished"?"Abolished Regular Crew":"Regular Crew";if(i.type==="extra")return"Extra Crew";return"Relief Crew"}
+
 function render(){
  const host=document.getElementById("cards");host.innerHTML="";
  state.items.forEach((i,idx)=>{
-   if(!visible(i))return;
-   const c=document.createElement("article");c.className="card"+(i.complete?" done":"");c.dataset.idx=idx;
-   c.innerHTML=`<div class="cardhead" onclick="toggleCard(${idx})">
-    <div class="badge">${i.type==="relief"?"Relief ":"Job "}${esc(i.crew)}</div>
-    <div class="meta"><strong>${title(i)}</strong><small>${i.complete?"Entry marked complete":"Tap to transcribe / review"}</small></div>
-    <span class="status">${i.complete?"Complete":"Open"}</span><span class="chev">›</span>
-   </div><div class="body">${bodyFor(i,idx)}</div>`;
-   host.appendChild(c);
- });
+  if(!visible(i))return;
+  const c=document.createElement("article");c.className="card"+(i.complete?" done":"");c.dataset.idx=idx;
+  const layout=(i.type==="regular"&&i.action!=="abolished")?" regularLayout":"";
+  c.innerHTML=`<div class="cardhead" onclick="toggleCard(${idx})"><div class="badge">${i.type==="relief"?"Relief ":"Job "}${esc(i.crew)}</div><div class="meta"><strong>${title(i)}</strong><small>${i.complete?"Entry marked complete":"Tap to transcribe / verify"}</small></div><span class="status">${i.complete?"Complete":"Open"}</span><span class="chev">›</span></div><div class="body${layout}">${bodyFor(i,idx)}</div>`;
+  host.appendChild(c)
+ })
 }
 function bodyFor(i,idx){
- if(i.action==="abolished")return abolishedBody(i,idx);
- if(i.type==="regular")return regularBody(i,idx);
- if(i.type==="extra")return extraBody(i,idx);
- return reliefBody(i,idx);
+ if(i.action==="abolished")return editorWrap(i,idx,abolishedEditor(i,idx));
+ if(i.type==="regular")return `${sourceDock(i,idx)}<div class="editorPane">${regularEditor(i,idx)}</div>`;
+ if(i.type==="extra")return editorWrap(i,idx,extraEditor(i,idx));
+ return editorWrap(i,idx,reliefEditor(i,idx))
 }
-function previousBlock(i){
- const p=PRIOR[i.crew];
- if(!p)return `<div class="note">No prior sample is loaded for this demo card. In the real builder, the last verified production revision would be available as a read-only reference.</div>`;
- return `<details class="block readonly"><summary>Previous verified revision ▸</summary><pre>${esc(JSON.stringify(p,null,2))}</pre></details>`;
+function editorWrap(i,idx,editor){return `${sourceDock(i,idx)}<div class="editorPane">${editor}</div>`}
+
+function sourceDock(i,idx){
+ const src=SOURCE_IMAGES[i.crew];
+ const ui=sourceUI[i.id]||{zoom:1,collapsed:false};
+ const checks=VERIFY_LABELS.filter(([k])=>i.verified&&Object.prototype.hasOwnProperty.call(i.verified,k)).map(([k,l])=>`<label class="vcheck"><input type="checkbox" ${i.verified[k]?'checked':''} onchange="setVerified(${idx},'${k}',this.checked)"> ${l}</label>`).join("");
+ return `<div class="sourceDock ${ui.collapsed?'collapsed':''}" id="source_${idx}">
+  <div class="sourceBar"><strong>Source • ${i.type==="relief"?"Relief ":"Job "}${esc(i.crew)}</strong>
+   ${src?`<button class="secondary" onclick="zoomSource(${idx},-.15)">−</button><button class="secondary" onclick="zoomSource(${idx},.15)">+</button><button class="secondary" onclick="resetSource(${idx})">Fit</button>`:""}
+   <button class="secondary" onclick="toggleSource(${idx})">${ui.collapsed?'Show':'Hide'}</button>
+  </div>
+  <div class="sourceViewport">${src?`<img id="sourceimg_${idx}" src="${src}" alt="Scanned source for Job ${esc(i.crew)}" style="width:${Math.round(ui.zoom*100)}%">`:`<div class="noSource">No scan attached in this small demo.<br>In a real revision package, each revised job would arrive with its source crop already attached.</div>`}</div>
+  <div class="sourceHint">${src?"Scroll inside the source window to move around the scan. Zoom buttons change the source size while the form remains below.":"Source crops would be generated from the revision PDF before you begin."}</div>
+  ${checks?`<div class="verifyStrip"><div class="verifyGrid">${checks}</div></div>`:""}
+ </div>`;
 }
+function ensureUI(i){if(!sourceUI[i.id])sourceUI[i.id]={zoom:1,collapsed:false};return sourceUI[i.id]}
+function zoomSource(idx,d){const i=state.items[idx],u=ensureUI(i);u.zoom=Math.max(.65,Math.min(2.2,u.zoom+d));const img=document.getElementById(`sourceimg_${idx}`);if(img)img.style.width=Math.round(u.zoom*100)+"%"}
+function resetSource(idx){const i=state.items[idx],u=ensureUI(i);u.zoom=1;const img=document.getElementById(`sourceimg_${idx}`);if(img)img.style.width="100%"}
+function toggleSource(idx){const i=state.items[idx],u=ensureUI(i);u.collapsed=!u.collapsed;render();reopen(idx)}
+function setVerified(idx,k,v){state.items[idx].verified[k]=v;save()}
+
 function coverageEditor(i,idx,key,title){
  const c=i[key]||blankCoverage();
- return `<div class="block">
- <label class="lbl">${title}</label>
- <select onchange="setNested(${idx},'${key}','day',this.value)">
- ${["","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d=>`<option value="${d}" ${c.day===d?'selected':''}>${d||"Select day…"}</option>`).join("")}
- </select>
- <div style="height:8px"></div>
- <label class="lbl">Covered by</label>
- <select onchange="setCoverType(${idx},'${key}',this.value)">
-  <option value="extra" ${c.coverType==="extra"?'selected':''}>Extra Crew</option>
-  <option value="job" ${c.coverType==="job"?'selected':''}>Job number</option>
- </select>
- <div id="coverjob_${idx}_${key}" style="margin-top:8px;${c.coverType==="job"?'':'display:none'}">
-  <label class="lbl">Covering job</label><input inputmode="numeric" value="${esc(c.coverJob)}" placeholder="Example: 474" oninput="setNested(${idx},'${key}','coverJob',this.value)">
- </div></div>`;
+ return `<div class="block"><label class="lbl">${title}</label><select onchange="setNested(${idx},'${key}','day',this.value)">${["","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d=>`<option value="${d}" ${c.day===d?'selected':''}>${d||"Select day…"}</option>`).join("")}</select><div style="height:8px"></div><label class="lbl">Covered by</label><select onchange="setCoverType(${idx},'${key}',this.value)"><option value="extra" ${c.coverType==="extra"?'selected':''}>Extra Crew</option><option value="job" ${c.coverType==="job"?'selected':''}>Job number</option></select><div id="coverjob_${idx}_${key}" style="margin-top:8px;${c.coverType==="job"?'':'display:none'}"><label class="lbl">Covering job</label><input inputmode="numeric" value="${esc(c.coverJob)}" placeholder="Example: 474" oninput="setNested(${idx},'${key}','coverJob',this.value)"></div></div>`
 }
-function movementSummary(m){
- if(m.type==="train"){
-   const a=[m.train?`Train ${m.train}`:"Train",m.from||"",m.depart||"",m.to?`→ ${m.to}`:"",m.arrive||""].filter(Boolean).join(" ");
-   return a||"Train line";
- }
- if(m.type==="deadhead"){
-   return ["DH",m.from||"",m.to?`→ ${m.to}`:"",m.depart||"",m.arrive||""].filter(Boolean).join(" ")||"Deadhead line";
- }
- return m.text||"Note line";
-}
+function movementSummary(m){if(m.type==="train")return[m.train?`Train ${m.train}`:"Train",m.from||"",m.depart||"",m.to?`→ ${m.to}`:"",m.arrive||""].filter(Boolean).join(" ");if(m.type==="deadhead")return["DH",m.from||"",m.to?`→ ${m.to}`:"",m.depart||"",m.arrive||""].filter(Boolean).join(" ");return m.text||"Note line"}
 function movementEditor(idx,section,n,m){
- const klass=m.type==="train"?"train":m.type==="deadhead"?"deadhead":"";
- const pill=m.type==="train"?"TRAIN":m.type==="deadhead"?"DEADHEAD":"NOTE";
- const pillcls=m.type==="deadhead"?"dh":m.type==="note"?"note":"";
+ const pill=m.type==="train"?"TRAIN":m.type==="deadhead"?"DEADHEAD":"NOTE",pillcls=m.type==="deadhead"?"dh":m.type==="note"?"note":"";
  let fields="";
- if(m.type==="train"){
-  fields=`<div class="grid2">
-   <div><label class="lbl">Train number</label><input inputmode="numeric" value="${esc(m.train)}" placeholder="6036" oninput="setMovement(${idx},'${section}',${n},'train',this.value)"></div>
-   <div><label class="lbl">Origin</label><input value="${esc(m.from)}" placeholder="Babylon" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div>
-   <div><label class="lbl">Departure</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div>
-   <div><label class="lbl">Destination</label><input value="${esc(m.to)}" placeholder="Penn Station" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div>
-   <div><label class="lbl">Arrival</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div>
-   <div><label class="lbl">Line note (optional)</label><input value="${esc(m.note)}" placeholder="Starred / equipment note…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"></div>
-  </div>`;
- }else if(m.type==="deadhead"){
-  fields=`<div class="grid2">
-   <div><label class="lbl">From</label><input value="${esc(m.from)}" placeholder="Jamaica" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div>
-   <div><label class="lbl">To</label><input value="${esc(m.to)}" placeholder="Babylon" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div>
-   <div><label class="lbl">Start time (if shown)</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div>
-   <div><label class="lbl">End time (if shown)</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div>
-  </div>
-  <div style="margin-top:8px"><label class="lbl">Deadhead note (optional)</label><input value="${esc(m.note)}" placeholder="DH to Jamaica / Sundays only…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"></div>`;
- }else{
-  fields=`<label class="lbl">Published line / note</label><textarea placeholder="Example: Change ends / DH to yard / * Sundays only" oninput="setMovement(${idx},'${section}',${n},'text',this.value)">${esc(m.text)}</textarea>`;
- }
- return `<div class="movement ${klass}">
-  <div class="movehead">
-   <div class="moveindex">${n+1}</div>
-   <span class="kindpill ${pillcls}">${pill}</span>
-   <div class="movetype">${esc(movementSummary(m))}</div>
-   <div class="moveactions">
-    <button class="secondary" onclick="moveLine(${idx},'${section}',${n},-1)" ${n===0?'disabled':''}>↑</button>
-    <button class="secondary" onclick="moveLine(${idx},'${section}',${n},1)">↓</button>
-    <button class="dangerbtn" onclick="removeMovement(${idx},'${section}',${n})">×</button>
-   </div>
-  </div>
-  <div class="movebody">${fields}</div>
- </div>`;
+ if(m.type==="train")fields=`<div class="grid2"><div><label class="lbl">Train number</label><input inputmode="numeric" value="${esc(m.train)}" placeholder="6036" oninput="setMovement(${idx},'${section}',${n},'train',this.value)"></div><div><label class="lbl">Origin</label><input value="${esc(m.from)}" placeholder="Babylon" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div><div><label class="lbl">Departure</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div><div><label class="lbl">Destination</label><input value="${esc(m.to)}" placeholder="Penn Station" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div><div><label class="lbl">Arrival</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div><div><label class="lbl">Line note</label><input value="${esc(m.note)}" placeholder="Starred / equipment note…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"></div></div>`;
+ else if(m.type==="deadhead")fields=`<div class="grid2"><div><label class="lbl">From</label><input value="${esc(m.from)}" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div><div><label class="lbl">To</label><input value="${esc(m.to)}" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div><div><label class="lbl">Start time (if shown)</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div><div><label class="lbl">End time (if shown)</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div></div><div style="margin-top:8px"><label class="lbl">Deadhead note</label><input value="${esc(m.note)}" placeholder="Sundays only…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"></div>`;
+ else fields=`<label class="lbl">Published line / note</label><textarea oninput="setMovement(${idx},'${section}',${n},'text',this.value)" placeholder="* Saturdays Only / change ends / other published note">${esc(m.text)}</textarea>`;
+ return `<div class="movement"><div class="movehead"><div class="moveindex">${n+1}</div><span class="kindpill ${pillcls}">${pill}</span><div class="movetype">${esc(movementSummary(m))}</div><div class="moveactions"><button class="secondary" onclick="moveLine(${idx},'${section}',${n},-1)">↑</button><button class="secondary" onclick="moveLine(${idx},'${section}',${n},1)">↓</button><button class="dangerbtn" onclick="removeMovement(${idx},'${section}',${n})">×</button></div></div><div class="movebody">${fields}</div></div>`
 }
 function movementBuilder(idx,section,movements){
- return `<div class="movement-shell">
-  <div id="moves_${idx}_${section}">
-   ${movements.length?movements.map((m,n)=>movementEditor(idx,section,n,m)).join(""):`<div class="empty">No movements entered yet. Add the first line exactly as it appears in the Crew Book.</div>`}
-  </div>
-  <div class="movement-tools">
-   <button class="bluebtn" onclick="addMovement(${idx},'${section}','train')">+ Train</button>
-   <button class="secondary" onclick="addMovement(${idx},'${section}','deadhead')">+ Deadhead</button>
-   <button class="warnbtn" onclick="addMovement(${idx},'${section}','note')">+ Note</button>
-  </div>
- </div>`;
+ return `<div class="movement-shell">${movements.length?movements.map((m,n)=>movementEditor(idx,section,n,m)).join(""):`<div class="empty">No assignment lines entered yet.</div>`}<div class="movement-tools"><button class="bluebtn" onclick="addMovement(${idx},'${section}','train')">+ Train</button><button class="secondary" onclick="addMovement(${idx},'${section}','deadhead')">+ Deadhead</button><button class="warnbtn" onclick="addMovement(${idx},'${section}','note')">+ Note</button></div></div>`
 }
 function exceptionEditor(idx,key,n,e){
- return `<div class="exception">
-  <div class="xrow">
-   <div><label class="lbl">Day / condition</label><input value="${esc(e.day||"")}" placeholder="Friday / Sundays only" oninput="setException(${idx},'${key}',${n},'day',this.value)"></div>
-   <div><label class="lbl">What differs?</label><select onchange="setException(${idx},'${key}',${n},'field',this.value)">
-    ${["Release","Report","Movement / service","Footnote","Multiple items"].map(x=>`<option ${e.field===x?'selected':''}>${x}</option>`).join("")}
-   </select></div>
-  </div>
-  <div class="xrow" style="margin-top:8px">
-   <div><label class="lbl">Override / details</label><input value="${esc(e.value||"")}" placeholder="12:53 AM / Train 8803 added…" oninput="setException(${idx},'${key}',${n},'value',this.value)"></div>
-   <div><label class="lbl">Date range (optional)</label><input value="${esc(e.range||"")}" placeholder="May 21–Sept. 3" oninput="setException(${idx},'${key}',${n},'range',this.value)"></div>
-  </div>
-  <div style="margin-top:8px"><label class="lbl">Clarifying note</label><input value="${esc(e.note||"")}" placeholder="Saturday report → Sunday after midnight" oninput="setException(${idx},'${key}',${n},'note',this.value)"></div>
-  <button class="dangerbtn smallbtn" style="margin-top:8px" onclick="removeException(${idx},'${key}',${n})">Remove exception</button>
- </div>`;
+ return `<div class="exception"><div class="xrow"><div><label class="lbl">Day / condition</label><input value="${esc(e.day||"")}" placeholder="Friday / Sundays only" oninput="setException(${idx},'${key}',${n},'day',this.value)"></div><div><label class="lbl">What differs?</label><select onchange="setException(${idx},'${key}',${n},'field',this.value)">${["Release","Report","Movement / service","Footnote","Multiple items"].map(x=>`<option ${e.field===x?'selected':''}>${x}</option>`).join("")}</select></div></div><div class="xrow" style="margin-top:8px"><div><label class="lbl">Override / details</label><input value="${esc(e.value||"")}" placeholder="12:53 AM / Train 8803 added…" oninput="setException(${idx},'${key}',${n},'value',this.value)"></div><div><label class="lbl">Date range</label><input value="${esc(e.range||"")}" placeholder="May 21–Sept. 3" oninput="setException(${idx},'${key}',${n},'range',this.value)"></div></div><div style="margin-top:8px"><label class="lbl">Clarifying note</label><input value="${esc(e.note||"")}" placeholder="Saturday report → Sunday after midnight" oninput="setException(${idx},'${key}',${n},'note',this.value)"></div><button class="dangerbtn smallbtn" style="margin-top:8px" onclick="removeException(${idx},'${key}',${n})">Remove exception</button></div>`
 }
-function periodEditor(i,idx,key,title){
+function periodEditor(i,idx,key){
  const p=i[key]||blankPeriod();
- return `<div class="block">
-  <div class="grid2">
-   <div><label class="lbl">Base report</label><input type="time" value="${esc(p.report)}" oninput="setPeriod(${idx},'${key}','report',this.value)"></div>
-   <div><label class="lbl">Base release</label><input type="time" value="${esc(p.release)}" oninput="setPeriod(${idx},'${key}','release',this.value)"></div>
-  </div>
-  <div class="section">Assignment lines — in published order</div>
-  ${movementBuilder(idx,key,p.movements||[])}
-  <div class="section">Day-specific / dated exceptions</div>
-  ${(p.exceptions||[]).map((e,n)=>exceptionEditor(idx,key,n,e)).join("")}
-  <button class="secondary smallbtn" onclick="addException(${idx},'${key}')">+ Add exception</button>
- </div>`;
+ return `<div class="block"><div class="grid2"><div><label class="lbl">Base report</label><input type="time" value="${esc(p.report)}" oninput="setPeriod(${idx},'${key}','report',this.value)"></div><div><label class="lbl">Base release</label><input type="time" value="${esc(p.release)}" oninput="setPeriod(${idx},'${key}','release',this.value)"></div></div><div class="section">Assignment lines — published order</div>${movementBuilder(idx,key,p.movements||[])}<div class="section">Day-specific / dated exceptions</div>${(p.exceptions||[]).map((e,n)=>exceptionEditor(idx,key,n,e)).join("")}<button class="secondary smallbtn" onclick="addException(${idx},'${key}')">+ Add exception</button></div>`
 }
-function regularBody(i,idx){
- return `${previousBlock(i)}
- <div class="section">Complete new assignment</div>
- <div class="grid2">
-  <div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div>
-  <div><label class="lbl">Pays meal period?</label><select onchange="setVal(${idx},'paysMeal',this.value)">
-   <option value="" ${!i.paysMeal?'selected':''}>Select…</option>
-   <option value="yes" ${i.paysMeal==="yes"?'selected':''}>Yes</option>
-   <option value="no" ${i.paysMeal==="no"?'selected':''}>No</option>
-  </select></div>
- </div>
- <div class="section">Relief days & who covers them</div>
- <div class="coverage">${coverageEditor(i,idx,"relief1","Relief day #1")}${coverageEditor(i,idx,"relief2","Relief day #2")}</div>
- <div class="section">Monday–Friday</div>${periodEditor(i,idx,"weekday","Monday–Friday")}
- <div class="section">Saturday–Sunday</div>${periodEditor(i,idx,"weekend","Saturday–Sunday")}
- <div class="section">Published footnotes / special date ranges</div>
- <textarea placeholder="Copy any remaining asterisk wording or date restrictions that apply to the assignment as a whole." oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea>
- <div class="section">Notes for review</div>
- <textarea placeholder="Example: Saturday into Sunday release time. Asterisk applies to the calendar day after midnight." oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>
- <div class="note">This note is included in the JSON handoff. Use plain railroad language — you do not have to translate it into programming rules.</div>
- ${diffBlock(i)}${completeButtons(idx,i)}`;
+function regularEditor(i,idx){
+ return `<div class="section" style="margin-top:0">Complete new assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Pays meal period?</label><select onchange="setVal(${idx},'paysMeal',this.value)"><option value="" ${!i.paysMeal?'selected':''}>Select…</option><option value="yes" ${i.paysMeal==="yes"?'selected':''}>Yes</option><option value="no" ${i.paysMeal==="no"?'selected':''}>No</option></select></div></div><div class="section">Relief days & who covers them</div><div class="coverage">${coverageEditor(i,idx,"relief1","Relief day #1")}${coverageEditor(i,idx,"relief2","Relief day #2")}</div><div class="section">Monday–Friday</div>${periodEditor(i,idx,"weekday")}<div class="section">Saturday–Sunday</div>${periodEditor(i,idx,"weekend")}<div class="section">Published footnotes / special date ranges</div><textarea oninput="setVal(${idx},'footnotes',this.value)" placeholder="Copy assignment-wide asterisk wording/date restrictions…">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)" placeholder="Saturday into Sunday release time; asterisk applies after midnight; anything you want me to understand…">${esc(i.notes)}</textarea><div class="note">Plain-language notes are intentional. You do not need to translate railroad wording into code rules.</div>${completeButton(i,idx)}`
 }
-function extraBody(i,idx){
- return `${previousBlock(i)}
- <div class="section">Complete Extra Crew assignment</div>
- <div class="grid2">
-  <div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div>
-  <div><label class="lbl">Active days / date restrictions</label><input value="${esc(i.active)}" placeholder="Mondays & Tuesday Sept. 8" oninput="setVal(${idx},'active',this.value)"></div>
-  <div><label class="lbl">Report</label><input type="time" value="${esc(i.report)}" oninput="setVal(${idx},'report',this.value)"></div>
-  <div><label class="lbl">Release</label><input type="time" value="${esc(i.release)}" oninput="setVal(${idx},'release',this.value)"></div>
- </div>
- <div class="section">Assignment lines — in published order</div>
- ${movementBuilder(idx,"movements",i.movements||[])}
- <div class="section">Footnotes / special dates</div>
- <textarea oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea>
- <div class="section">Notes for review</div>
- <textarea placeholder="Anything you want me to understand about this Extra Crew assignment…" oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>
- ${diffBlock(i)}${completeButtons(idx,i)}`;
+function extraEditor(i,idx){
+ return `<div class="section" style="margin-top:0">Complete Extra Crew assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Active days / date restrictions</label><input value="${esc(i.active)}" oninput="setVal(${idx},'active',this.value)"></div><div><label class="lbl">Report</label><input type="time" value="${esc(i.report)}" oninput="setVal(${idx},'report',this.value)"></div><div><label class="lbl">Release</label><input type="time" value="${esc(i.release)}" oninput="setVal(${idx},'release',this.value)"></div></div><div class="section">Assignment lines</div>${movementBuilder(idx,"movements",i.movements||[])}<div class="section">Footnotes / special dates</div><textarea oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
 }
-function reliefBody(i,idx){
- return `${previousBlock(i)}
- <div class="section">Complete Relief Crew table row</div>
- <div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div>
- <div class="section">Monday through Sunday</div>
- <div class="week">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="daycell"><label>${d}</label><input value="${esc(i.week[d]||"")}" placeholder="Job / R" oninput="setWeek(${idx},'${d}',this.value)"></div>`).join("")}</div>
- <div class="note">Enter the covered job number exactly as shown, or <strong>R</strong> for the relief crew's own relief day.</div>
- <div class="section">Notes for review</div>
- <textarea oninput="setVal(${idx},'notes',this.value)" placeholder="Anything unusual about this relief row…">${esc(i.notes)}</textarea>
- ${diffBlock(i)}${completeButtons(idx,i)}`;
+function reliefEditor(i,idx){
+ return `<div class="section" style="margin-top:0">Complete Relief Crew row</div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"><div class="section">Monday through Sunday</div><div class="week">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="daycell"><label>${d}</label><input value="${esc(i.week[d]||"")}" placeholder="Job / R" oninput="setWeek(${idx},'${d}',this.value)"></div>`).join("")}</div><div class="note">Enter the covered job number exactly as shown, or R for the relief crew's own relief day.</div><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
 }
-function abolishedBody(i,idx){
- return `${previousBlock(i)}<div class="note">For an abolished crew, no schedule transcription is needed.</div>
- <div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButtons(idx,i)}`;
-}
-function completeButtons(idx,i){return `<div class="btnrow"><button class="${i.complete?'secondary':'primary'}" onclick="toggleComplete(${idx})">${i.complete?'Mark unfinished':'Mark complete ✓'}</button></div>`}
-
-function normalize(v){return v==null?"":String(v).trim()}
-function flatten(obj,prefix="",out={}){
- if(obj===null||typeof obj!=="object"){out[prefix]=obj;return out}
- if(Array.isArray(obj)){out[prefix]=JSON.stringify(obj);return out}
- Object.keys(obj).forEach(k=>flatten(obj[k],prefix?prefix+"."+k:k,out));return out
-}
-function diffFor(i){
- const p=PRIOR[i.crew];if(!p)return[];
- const a=flatten(p),b=flatten(i),ignore=["id","type","crew","action","complete"];
- const diffs=[];
- Object.keys(b).forEach(k=>{
-  if(ignore.includes(k.split(".")[0]))return;
-  if(a[k]!==undefined && normalize(a[k])!==normalize(b[k]) && normalize(b[k])!=="")diffs.push(`${k}: ${a[k]||"—"} → ${b[k]}`);
- });
- return diffs.slice(0,14);
-}
-function diffBlock(i){
- if(!PRIOR[i.crew])return"";
- const d=diffFor(i);
- return `<div class="diff"><strong>Automatic comparison preview</strong>${d.length?`<ul>${d.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<div class="small" style="margin-top:6px">No populated fields differ from the prior sample yet.</div>`}</div>`;
-}
+function abolishedEditor(i,idx){return `<div class="note">For an abolished crew, no assignment transcription is needed.</div><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`}
+function completeButton(i,idx){return `<div class="btnrow"><button class="${i.complete?'secondary':'primary'}" onclick="toggleComplete(${idx})">${i.complete?'Mark unfinished':'Mark complete ✓'}</button></div>`}
 
 function toggleCard(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.toggle("open")}
 function reopen(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.add("open")}
-function setVal(idx,key,v){state.items[idx][key]=v;save()}
-function setNested(idx,key,sub,v){state.items[idx][key][sub]=v;save()}
-function setPeriod(idx,key,sub,v){state.items[idx][key][sub]=v;save()}
-function setWeek(idx,day,v){state.items[idx].week[day]=v;save()}
-function setCoverType(idx,key,v){state.items[idx][key].coverType=v;if(v==="extra")state.items[idx][key].coverJob="";save();const x=document.getElementById(`coverjob_${idx}_${key}`);if(x)x.style.display=v==="job"?"block":"none"}
-
-function getMovementArray(idx,section){
- const i=state.items[idx];
- if(section==="movements")return i.movements;
- return i[section].movements;
-}
-function addMovement(idx,section,type){
- getMovementArray(idx,section).push(movement(type));save();render();reopen(idx)
-}
-function removeMovement(idx,section,n){getMovementArray(idx,section).splice(n,1);save();render();reopen(idx)}
-function moveLine(idx,section,n,delta){
- const arr=getMovementArray(idx,section),to=n+delta;if(to<0||to>=arr.length)return;
- [arr[n],arr[to]]=[arr[to],arr[n]];save();render();reopen(idx)
-}
-function setMovement(idx,section,n,key,v){getMovementArray(idx,section)[n][key]=v;save()}
-
-function addException(idx,key){state.items[idx][key].exceptions.push({day:"",field:"Release",value:"",range:"",note:""});save();render();reopen(idx)}
-function removeException(idx,key,n){state.items[idx][key].exceptions.splice(n,1);save();render();reopen(idx)}
-function setException(idx,key,n,field,v){state.items[idx][key].exceptions[n][field]=v;save()}
+function setVal(idx,k,v){state.items[idx][k]=v;save()} function setNested(idx,k,s,v){state.items[idx][k][s]=v;save()}
+function setPeriod(idx,k,s,v){state.items[idx][k][s]=v;save()} function setWeek(idx,d,v){state.items[idx].week[d]=v;save()}
+function setCoverType(idx,k,v){state.items[idx][k].coverType=v;if(v==="extra")state.items[idx][k].coverJob="";save();const x=document.getElementById(`coverjob_${idx}_${k}`);if(x)x.style.display=v==="job"?"block":"none"}
+function getMoveArray(idx,section){const i=state.items[idx];return section==="movements"?i.movements:i[section].movements}
+function addMovement(idx,section,type){getMoveArray(idx,section).push(movement(type));save();render();reopen(idx)}
+function removeMovement(idx,section,n){getMoveArray(idx,section).splice(n,1);save();render();reopen(idx)}
+function moveLine(idx,section,n,d){const a=getMoveArray(idx,section),to=n+d;if(to<0||to>=a.length)return;[a[n],a[to]]=[a[to],a[n]];save();render();reopen(idx)}
+function setMovement(idx,section,n,k,v){getMoveArray(idx,section)[n][k]=v;save()}
+function addException(idx,k){state.items[idx][k].exceptions.push({day:"",field:"Release",value:"",range:"",note:""});save();render();reopen(idx)}
+function removeException(idx,k,n){state.items[idx][k].exceptions.splice(n,1);save();render();reopen(idx)}
+function setException(idx,k,n,f,v){state.items[idx][k].exceptions[n][f]=v;save()}
 function toggleComplete(idx){state.items[idx].complete=!state.items[idx].complete;save(true);render()}
-function setRevision(k,v){state.revision[k]=v;save()}
-function setGeneralNotes(v){state.revision.generalNotes=v;save()}
-function updateProgress(){
- const n=state.items.filter(x=>x.complete).length,t=state.items.length;
- document.getElementById("progressText").textContent=`${n} of ${t} complete`;
- document.getElementById("progressBar").style.width=(n/t*100)+"%";
-}
-function exportData(){
- return {...state,exportedAt:new Date().toISOString(),
- handoffNote:"Full new-revision transcription. Movements are ordered line-by-line. User notes are interpretive aids; official Crew Book pages remain authoritative for verification."}
-}
+function setRevision(k,v){state.revision[k]=v;save()} function setGeneralNotes(v){state.revision.generalNotes=v;save()}
+function updateProgress(){const n=state.items.filter(x=>x.complete).length,t=state.items.length;document.getElementById("progressText").textContent=`${n} of ${t} complete`;document.getElementById("progressBar").style.width=(n/t*100)+"%"}
+function exportData(){return{...state,exportedAt:new Date().toISOString(),handoffNote:"Full new-revision transcription with ordered movements, source-verification checklist, and reviewer notes. Official Crew Book scan remains authoritative."}}
 function updatePreview(){document.getElementById("preview").textContent=JSON.stringify(exportData(),null,2)}
-function exportJson(){
- const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:"application/json"}),a=document.createElement("a");
- a.href=URL.createObjectURL(blob);a.download=`Crew_Book_GO${state.revision.go}_Rev${state.revision.revision}_progress.json`;
- document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("JSON backup exported")
-}
-function importJson(file){
- if(!file)return;const r=new FileReader();
- r.onload=()=>{try{
-  const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw new Error("Invalid");
-  state={schema:x.schema||"epl-crew-revision-builder-v3",revision:x.revision,items:x.items};
-  localStorage.setItem(KEY,JSON.stringify(state));syncHeader();render();updateProgress();updatePreview();toast("Backup imported")
- }catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};
- r.readAsText(file);document.getElementById("importFile").value="";
-}
-function resetDemo(){
- if(!confirm("Reset all prototype entries stored on this device?"))return;
- state=fresh();localStorage.removeItem(KEY);syncHeader();render();updateProgress();updatePreview();toast("Prototype reset")
-}
-function syncHeader(){
- document.getElementById("go").value=state.revision.go||"";
- document.getElementById("rev").value=state.revision.revision||"";
- document.getElementById("eff").value=state.revision.effective||"";
- document.getElementById("generalNotes").value=state.revision.generalNotes||"";
-}
+function exportJson(){const b=new Blob([JSON.stringify(exportData(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`Crew_Book_GO${state.revision.go}_Rev${state.revision.revision}_progress.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("JSON backup exported")}
+function importJson(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw 0;state={schema:x.schema||"epl-crew-revision-builder-keeper-v1",revision:x.revision,items:x.items};localStorage.setItem(KEY,JSON.stringify(state));syncHeader();render();updateProgress();updatePreview();toast("Backup imported")}catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};r.readAsText(file);document.getElementById("importFile").value=""}
+function resetDemo(){if(!confirm("Reset all entries stored on this device?"))return;state=fresh();sourceUI={};localStorage.removeItem(KEY);syncHeader();render();updateProgress();updatePreview();toast("Builder reset")}
+function syncHeader(){document.getElementById("go").value=state.revision.go||"";document.getElementById("rev").value=state.revision.revision||"";document.getElementById("eff").value=state.revision.effective||"";document.getElementById("generalNotes").value=state.revision.generalNotes||""}
 function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
-document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
- document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentTab=b.dataset.tab;render()
-}));
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentTab=b.dataset.tab;render()}));
 syncHeader();render();updateProgress();updatePreview();
 </script>
 </body>
