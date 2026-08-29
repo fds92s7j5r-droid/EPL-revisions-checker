@@ -1,32 +1,527 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1015"><title>Engineer Pay Log — Crew Book Revision Builder Demo</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1117">
+<title>Engineer Pay Log — Crew Book Revision Builder Prototype 2</title>
 <style>
-:root{--bg:#0b1015;--card:#121a22;--card2:#17212b;--text:#f4f7f9;--muted:#9eabb7;--line:#283644;--accent:#50c878;--danger:#e56767;--input:#0e151c}*{box-sizing:border-box}html,body{background:var(--bg)}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);min-height:100vh}.wrap{max-width:760px;margin:auto;padding:18px 12px 110px}.hero,.progress,.job,details{background:var(--card);border:1px solid var(--line);border-radius:18px}.hero{padding:18px;margin-bottom:12px}.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:800}h1{font-size:24px;margin:7px 0 8px}.hero p{margin:0;color:var(--muted);line-height:1.45;font-size:14px}.demo{margin-top:12px;padding:10px 12px;border-radius:12px;background:#182319;border:1px solid #2d5b39;color:#c9efd2;font-size:13px;font-weight:700}.scope{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.scope div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}.scope strong{display:block;font-size:20px}.scope span{font-size:11px;color:var(--muted)}.progress{position:sticky;top:8px;z-index:5;padding:12px;margin-bottom:10px;background:rgba(18,26,34,.95);backdrop-filter:blur(10px)}.prow{display:flex;justify-content:space-between;gap:10px}.prow strong{font-size:14px}.prow span{font-size:12px;color:var(--muted)}.bar{height:8px;background:#202c37;border-radius:999px;overflow:hidden;margin-top:9px}.bar div{height:100%;background:var(--accent);width:0}.filters{display:flex;gap:8px;overflow:auto;padding:2px 0 8px}.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:9px 12px;font-size:13px;font-weight:700}.chip.active{border-color:var(--accent);background:#153322}.job{margin:10px 0;overflow:hidden}.job.added{border-color:#31573b}.job.abolished{border-color:#63363b}.head{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}.badge{min-width:60px;text-align:center;padding:8px;border-radius:11px;background:#0d151b;border:1px solid var(--line);font-weight:850}.meta{flex:1}.meta strong{display:block}.meta small{color:var(--muted)}.status{font-size:12px;font-weight:800;border-radius:999px;padding:6px 9px;background:#232f3a;color:var(--muted)}.complete .status{background:#153322;color:#bff7cc}.body{display:none;border-top:1px solid var(--line);padding:14px}.open .body{display:block}.section{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:850;margin:2px 0 9px}.checkgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;align-items:center;gap:9px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px;font-size:13px;font-weight:700}.check input{width:20px;height:20px;accent-color:var(--accent)}.field{display:none;border-top:1px dashed #334250;padding-top:12px;margin-top:12px}.field.show{display:block}.txt{display:block;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:6px}input[type=time],input[type=text],select,textarea{width:100%;font:inherit;color:var(--text);background:var(--input);border:1px solid #334250;border-radius:11px;padding:11px 12px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}textarea{min-height:82px}.callout{background:#2a2416;border:1px solid #66552d;color:#f4dca7;border-radius:12px;padding:10px 11px;font-size:12px;line-height:1.4;margin-top:10px}.actions{display:flex;gap:8px;margin-top:14px}button{font:inherit;border:0;border-radius:12px;padding:11px 13px;font-weight:800}.primary{background:var(--accent);color:#07130b}.secondary{background:#26333f;color:var(--text);border:1px solid #344554}.actions button{flex:1}details{padding:12px 14px;margin-top:14px}pre{white-space:pre-wrap;word-break:break-word;background:#081017;border-radius:12px;padding:12px;color:#cce5d4;border:1px solid #253643;font-size:11px;max-height:320px;overflow:auto}.footer{position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,20,.96);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));z-index:10}.footerin{max-width:760px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:9px}.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:#e8f7ec;color:#0c3018;padding:10px 14px;border-radius:999px;font-size:13px;font-weight:800;opacity:0;transition:.2s;z-index:20}.toast.show{opacity:1}@media(max-width:480px){.checkgrid,.two{grid-template-columns:1fr}h1{font-size:22px}}
-</style></head><body><div class="wrap">
-<section class="hero"><div class="eyebrow">Engineer Pay Log • Prototype</div><h1>Crew Book Revision Builder</h1><p>Phone-friendly example for entering only the assignments changed by a new Crew Book revision.</p><div class="demo">DEMO ONLY — this does not modify Engineer Pay Log or production Crew Book data.</div><div class="scope"><div><strong>4</strong><span>Revised samples</span></div><div><strong>2</strong><span>Added samples</span></div><div><strong>1</strong><span>Abolished sample</span></div></div></section>
-<section class="progress"><div class="prow"><strong id="pt">0 of 7 completed</strong><span id="save">Autosaves locally</span></div><div class="bar"><div id="bar"></div></div></section>
-<div class="filters"><button class="chip active" data-f="all">All</button><button class="chip" data-f="unfinished">Unfinished</button><button class="chip" data-f="revised">Revised</button><button class="chip" data-f="added">Added</button><button class="chip" data-f="abolished">Abolished</button></div>
-<main id="jobs"></main>
-<details><summary><b>Preview exported revision data</b></summary><p style="color:var(--muted);font-size:13px">This is roughly what you would send back to me when you're finished.</p><pre id="preview">{}</pre></details></div>
-<div class="footer"><div class="footerin"><button id="reset" class="secondary">Reset Demo</button><button id="export" class="primary">Export JSON</button></div></div><div id="toast" class="toast">Saved</div>
+:root{
+  --bg:#0b1117;--panel:#111a22;--panel2:#16222c;--panel3:#0e161d;
+  --text:#f5f7f9;--muted:#9aa8b5;--line:#2b3a47;
+  --green:#55cc7a;--green2:#183923;--amber:#e8ba63;--amber2:#332917;
+  --red:#ef7777;--blue:#72b7ff;--input:#0c141b;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:820px;margin:0 auto;padding:14px 12px 120px}
+.hero,.card,.sticky,.general{
+  border:1px solid var(--line);background:var(--panel);border-radius:18px
+}
+.hero{padding:18px;margin-bottom:12px}
+.eyebrow{font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--green)}
+h1{font-size:24px;line-height:1.15;margin:7px 0 8px}
+.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
+.demo{margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid #355c40;background:#15281b;color:#c9f1d3;font-size:12px;font-weight:800}
+.sticky{
+  position:sticky;top:6px;z-index:20;margin-bottom:10px;padding:11px;
+  background:rgba(11,17,23,.94);backdrop-filter:blur(12px)
+}
+.row{display:flex;align-items:center;gap:8px}
+.space{justify-content:space-between}
+.progress{height:8px;background:#202c36;border-radius:999px;overflow:hidden;margin-top:8px}
+.progress>div{height:100%;width:0;background:var(--green);transition:.2s}
+.small{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:7px;overflow:auto;scrollbar-width:none;padding:2px 0 9px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  border:1px solid var(--line);background:var(--panel);color:var(--text);
+  padding:9px 11px;border-radius:999px;font-size:12px;font-weight:850;white-space:nowrap
+}
+.tab.active{border-color:var(--green);background:var(--green2);color:#d8ffe2}
+.general{padding:14px;margin-bottom:10px}
+.general textarea{min-height:70px}
+.card{margin:10px 0;overflow:hidden}
+.card.done{border-color:#315c3e}
+.cardhead{padding:13px;display:flex;gap:10px;align-items:center;cursor:pointer;user-select:none}
+.badge{
+  min-width:66px;text-align:center;padding:8px 10px;border-radius:11px;background:var(--panel3);
+  border:1px solid var(--line);font-weight:900
+}
+.meta{flex:1;min-width:0}
+.meta strong{display:block;font-size:15px}
+.meta small{display:block;color:var(--muted);margin-top:3px}
+.status{font-size:11px;font-weight:900;padding:6px 9px;border-radius:999px;background:#25323d;color:#b9c3cc}
+.done .status{background:var(--green2);color:#c9f7d4}
+.chev{font-size:19px;color:var(--muted)}
+.body{display:none;border-top:1px solid var(--line);padding:13px}
+.card.open .body{display:block}
+.section{
+  margin:14px 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:900
+}
+label.lbl{display:block;font-size:12px;color:var(--muted);font-weight:850;margin:0 0 5px}
+input,select,textarea{
+  width:100%;background:var(--input);color:var(--text);border:1px solid #324350;
+  border-radius:10px;padding:10px 11px;font:inherit;outline:none
+}
+input:focus,select:focus,textarea:focus{border-color:var(--green)}
+textarea{min-height:82px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.block{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:11px;margin:8px 0}
+.readonly{background:#0b1218}
+.readonly summary{cursor:pointer;font-size:12px;font-weight:900;color:#c8d0d7}
+.readonly pre{white-space:pre-wrap;word-break:break-word;margin:9px 0 0;color:#aebbc5;font-size:11px;line-height:1.45}
+.coverage{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.exception{
+  background:#101920;border:1px dashed #425361;border-radius:12px;padding:10px;margin:8px 0
+}
+.exception .xrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btnrow{display:flex;gap:8px;margin-top:9px}
+button{
+  border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:850;cursor:pointer
+}
+.primary{background:var(--green);color:#07140b}
+.secondary{background:#263641;color:var(--text);border:1px solid #3a4a56}
+.smallbtn{padding:8px 10px;font-size:12px}
+.warnbtn{background:#3a2b18;color:#ffdba0;border:1px solid #674a22}
+.dangerbtn{background:#3a2022;color:#ffc1c1;border:1px solid #673638}
+.btnrow button{flex:1}
+.note{
+  border:1px solid #6b5629;background:var(--amber2);color:#f0d39a;border-radius:11px;
+  padding:9px 10px;font-size:12px;line-height:1.4;margin-top:8px
+}
+.diff{
+  border:1px solid #345d77;background:#102433;border-radius:11px;padding:10px;margin-top:10px
+}
+.diff strong{color:#bfe2ff}
+.diff ul{margin:7px 0 0;padding-left:18px;color:#d5e8f6;font-size:12px;line-height:1.5}
+.week{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px
+}
+.daycell{min-width:0}
+.daycell label{display:block;font-size:10px;color:var(--muted);font-weight:900;margin-bottom:4px;text-align:center}
+.daycell input{text-align:center;padding:9px 4px}
+.footer{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(9,14,19,.97);
+  border-top:1px solid var(--line);padding:9px max(11px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(11px,env(safe-area-inset-left))
+}
+.footerin{max-width:820px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.footer button{padding:11px 7px;font-size:12px}
+.hidden{display:none!important}
+.toast{
+  position:fixed;bottom:94px;left:50%;transform:translateX(-50%);z-index:50;
+  opacity:0;pointer-events:none;transition:.18s;background:#eaf8ee;color:#13341c;
+  padding:9px 13px;border-radius:999px;font-size:12px;font-weight:900;white-space:nowrap
+}
+.toast.show{opacity:1}
+.importInput{display:none}
+.preview{
+  margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px
+}
+.preview summary{cursor:pointer;font-weight:900}
+.preview pre{white-space:pre-wrap;word-break:break-word;background:#081017;border:1px solid #263743;border-radius:10px;padding:10px;max-height:330px;overflow:auto;font-size:10.5px;color:#cce4d3}
+@media(max-width:600px){
+  .grid2,.grid3,.coverage{grid-template-columns:1fr}
+  .week{grid-template-columns:repeat(4,1fr)}
+  .week .daycell:nth-child(n+5){grid-column:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Engineer Pay Log • Prototype 2</div>
+    <h1>Crew Book Revision Builder</h1>
+    <p>Transcribe the complete revised assignment instead of trying to spot every difference yourself. The builder preserves the full new record and shows a comparison against the prior verified revision.</p>
+    <div class="demo">STANDALONE DEMO — nothing entered here modifies Engineer Pay Log or production data.</div>
+  </section>
+
+  <section class="sticky">
+    <div class="row space">
+      <strong id="progressText">0 of 5 complete</strong>
+      <span class="small" id="saveText">Autosaves locally</span>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="all">All</button>
+    <button class="tab" data-tab="regular">Regular Crews</button>
+    <button class="tab" data-tab="extra">Extra Crews</button>
+    <button class="tab" data-tab="relief">Relief Crews</button>
+    <button class="tab" data-tab="added">Added</button>
+    <button class="tab" data-tab="abolished">Abolished</button>
+    <button class="tab" data-tab="unfinished">Unfinished</button>
+  </div>
+
+  <section class="general">
+    <div class="section" style="margin-top:0">Revision information</div>
+    <div class="grid3">
+      <div><label class="lbl">General Order</label><input id="go" value="202" oninput="setRevision('go',this.value)"></div>
+      <div><label class="lbl">Revision</label><input id="rev" value="7" oninput="setRevision('revision',this.value)"></div>
+      <div><label class="lbl">Effective date</label><input id="eff" type="date" value="2026-09-08" oninput="setRevision('effective',this.value)"></div>
+    </div>
+    <div style="margin-top:10px">
+      <label class="lbl">General revision notes for review</label>
+      <textarea id="generalNotes" placeholder="Example: Weekend wording in this revision uses calendar day after midnight in several assignments." oninput="setGeneralNotes(this.value)"></textarea>
+    </div>
+  </section>
+
+  <main id="cards"></main>
+
+  <details class="preview">
+    <summary>Preview JSON backup / handoff file</summary>
+    <pre id="preview"></pre>
+  </details>
+</div>
+
+<div class="footer">
+  <div class="footerin">
+    <button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <button class="primary" onclick="exportJson()">Export JSON</button>
+    <button class="dangerbtn" onclick="resetDemo()">Reset</button>
+  </div>
+</div>
+<input id="importFile" class="importInput" type="file" accept=".json,application/json" onchange="importJson(this.files[0])">
+<div id="toast" class="toast">Saved</div>
+
 <script>
-const KEY='eplCrewRevisionBuilderDemo_v1';
-const seed=[['1','revised'],['14','revised'],['181','revised'],['277','revised'],['203','added'],['329','added'],['18','abolished']];
-const types=[['report','Report time'],['release','Release time'],['weekday','Mon–Fri schedule'],['weekend','Sat–Sun schedule'],['relief','Relief days'],['meal','Meal period'],['trains','Trains / service'],['footnote','Special date / footnote']];
-const blank=([crew,kind])=>({crew,kind,complete:false,changes:{},report:{old:'',new:''},release:{old:'',new:''},weekday:'',weekend:'',relief:'',meal:'',trains:'',footnote:'',midnight:false,midnightBasis:'',notes:''});
-const fresh=()=>({revision:{number:'7',effective:'2026-09-08',go:'202'},items:seed.map(blank)});
-let state;try{state=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){state=fresh()}let filter='all';
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function save(){localStorage.setItem(KEY,JSON.stringify(state));document.getElementById('save').textContent='Saved • '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});progress();preview()}
-function timeField(i,it,k,label){return `<div class="field ${it.changes[k]?'show':''}" data-field="${k}"><div class="section">${label}</div><div class="two"><div><label class="txt">Old (optional)</label><input type="time" value="${esc(it[k].old)}" oninput="nested(${i},'${k}','old',this.value)"></div><div><label class="txt">New</label><input type="time" value="${esc(it[k].new)}" oninput="nested(${i},'${k}','new',this.value)"></div></div></div>`}
-function textField(i,it,k,label,ph){return `<div class="field ${it.changes[k]?'show':''}" data-field="${k}"><label class="txt">${label}</label><input type="text" value="${esc(it[k])}" placeholder="${esc(ph)}" oninput="val(${i},'${k}',this.value)"></div>`}
-function areaField(i,it,k,label,ph){return `<div class="field ${it.changes[k]?'show':''}" data-field="${k}"><label class="txt">${label}</label><textarea placeholder="${esc(ph)}" oninput="val(${i},'${k}',this.value)">${esc(it[k])}</textarea></div>`}
-function body(i,it){if(it.kind==='abolished')return `<div class="callout">For an abolished assignment, we only need confirmation and an optional note. The revision patch would remove this job.</div><div class="field show"><label class="txt">Optional note</label><textarea oninput="val(${i},'notes',this.value)">${esc(it.notes)}</textarea></div><div class="actions"><button class="${it.complete?'secondary':'primary'}" onclick="complete(${i})">${it.complete?'Mark Unfinished':'Mark Complete ✓'}</button></div>`;
-let checks=types.map(([k,l])=>`<label class="check"><input type="checkbox" ${it.changes[k]?'checked':''} onchange="change(${i},'${k}',this.checked)">${l}</label>`).join('');
-return `<div class="section">What changed?</div><div class="checkgrid">${checks}</div>${timeField(i,it,'report','Report time')}${timeField(i,it,'release','Release time')}${textField(i,it,'weekday','Mon–Fri schedule','Example: report/release or service change')}${textField(i,it,'weekend','Sat–Sun schedule','Example: Sat release 2:19 AM; Sun 2:29 AM')}${textField(i,it,'relief','Relief days','Example: Wed / Thu')}<div class="field ${it.changes.meal?'show':''}" data-field="meal"><label class="txt">Meal period</label><select onchange="val(${i},'meal',this.value)"><option value="">Select…</option><option value="pays" ${it.meal==='pays'?'selected':''}>Pays meal period</option><option value="does_not_pay" ${it.meal==='does_not_pay'?'selected':''}>Does not pay meal period</option></select></div>${areaField(i,it,'trains','Trains / service','Enter only the changed train/service information.')}<div class="field ${it.changes.footnote?'show':''}" data-field="footnote"><label class="txt">Special date / footnote</label><textarea placeholder="Example: Sundays only / Friday reports only / Oct. 16–Nov. 6" oninput="val(${i},'footnote',this.value)">${esc(it.footnote)}</textarea><label class="check" style="margin-top:9px"><input type="checkbox" ${it.midnight?'checked':''} onchange="midnight(${i},this.checked)">Activity crosses midnight / day wording may be ambiguous</label><div id="mid_${i}" style="${it.midnight?'':'display:none'};margin-top:9px"><label class="txt">Footnote applies based on…</label><select onchange="val(${i},'midnightBasis',this.value)"><option value="">Needs verification</option><option value="report_day" ${it.midnightBasis==='report_day'?'selected':''}>Report day</option><option value="activity_day" ${it.midnightBasis==='activity_day'?'selected':''}>Calendar day of starred activity</option></select><div class="callout">This is designed to catch the Saturday-report → Sunday-after-midnight type of mistake instead of assuming the footnote belongs to the report day.</div></div></div><div class="field show"><label class="txt">General notes (optional)</label><textarea placeholder="Anything you want me to double-check…" oninput="val(${i},'notes',this.value)">${esc(it.notes)}</textarea></div><div class="actions"><button class="${it.complete?'secondary':'primary'}" onclick="complete(${i})">${it.complete?'Mark Unfinished':'Mark Complete ✓'}</button></div>`}
-function render(){let h='';state.items.forEach((it,i)=>{if(filter==='unfinished'&&it.complete)return;if(!['all','unfinished'].includes(filter)&&it.kind!==filter)return;let n=Object.values(it.changes).filter(Boolean).length;h+=`<article class="job ${it.kind} ${it.complete?'complete':''}" data-i="${i}"><div class="head" onclick="this.parentElement.classList.toggle('open')"><div class="badge">Job ${esc(it.crew)}</div><div class="meta"><strong>${it.kind[0].toUpperCase()+it.kind.slice(1)}</strong><small>${it.kind==='abolished'?'No replacement fields needed':n?n+' change type'+(n===1?'':'s')+' selected':'Tap to enter changes'}</small></div><span class="status">${it.complete?'Complete':'Open'}</span><span>›</span></div><div class="body">${body(i,it)}</div></article>`});document.getElementById('jobs').innerHTML=h}
-function change(i,k,v){state.items[i].changes[k]=v;save();let el=document.querySelector(`.job[data-i="${i}"]`);if(el){let f=el.querySelector(`[data-field="${k}"]`);if(f)f.classList.toggle('show',v)}}function val(i,k,v){state.items[i][k]=v;save()}function nested(i,k,s,v){state.items[i][k][s]=v;save()}function midnight(i,v){state.items[i].midnight=v;save();let e=document.getElementById('mid_'+i);if(e)e.style.display=v?'block':'none'}function complete(i){state.items[i].complete=!state.items[i].complete;save();render();toast(state.items[i].complete?'Marked complete':'Marked unfinished')}
-function progress(){let d=state.items.filter(x=>x.complete).length,t=state.items.length;document.getElementById('pt').textContent=`${d} of ${t} completed`;document.getElementById('bar').style.width=(d/t*100)+'%'}
-function cleaned(){return {format:'Engineer Pay Log Crew Book Revision Patch Demo',revision:state.revision,source_note:'Demo sample from the Sept. 8, 2026 revision cover. User-entered values still require source-page verification.',assignments:state.items.map(it=>{let o={crew:it.crew,action:it.kind,complete:it.complete};if(it.kind==='abolished'){if(it.notes)o.notes=it.notes;return o}let ch=Object.keys(it.changes).filter(k=>it.changes[k]),vals={};ch.forEach(k=>vals[k]=it[k]);if(it.midnight)vals.midnight_review={enabled:true,basis:it.midnightBasis||'needs_verification'};if(it.notes)vals.notes=it.notes;return {...o,changed_fields:ch,values:vals}})}}function preview(){document.getElementById('preview').textContent=JSON.stringify(cleaned(),null,2)}function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400)}
-document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.f;render()});document.getElementById('reset').onclick=()=>{if(confirm('Reset all demo entries?')){state=fresh();localStorage.removeItem(KEY);render();progress();preview();toast('Demo reset')}};document.getElementById('export').onclick=()=>{let blob=new Blob([JSON.stringify(cleaned(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Crew_Book_Revision_7_DEMO_changes.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('JSON created')};render();progress();preview();
-</script></body></html>
+const KEY='eplCrewRevisionBuilderPrototype2';
+
+const PRIOR={
+  "277":{
+    terminal:"Babylon Yard", relief1:{day:"Wednesday",coverType:"job",coverJob:"474"}, relief2:{day:"Thursday",coverType:"job",coverJob:"474"},
+    paysMeal:"no",
+    weekday:{report:"18:21",release:"02:29",service:"Prior verified weekday service"},
+    weekend:{report:"18:21",release:"02:19",service:"Prior verified weekend service"},
+    notes:"Rev. 6 verified Saturday report → Sunday release 2:19 AM; Sunday report → Monday release 2:29 AM."
+  },
+  "10":{
+    terminal:"Jamaica", relief1:{day:"Saturday",coverType:"extra",coverJob:""}, relief2:{day:"Sunday",coverType:"extra",coverJob:""},
+    paysMeal:"no",
+    weekday:{report:"16:58",release:"01:20",service:"Prior verified weekday service"},
+    weekend:{report:"09:12",release:"16:15",service:"6036 / 6037 / 6058"},
+    notes:"Prior verified Thursday seasonal release exception exists."
+  },
+  "61":{
+    terminal:"Jamaica Storage Yard", active:"Mondays", report:"01:46", release:"06:57", service:"3032 Jamaica → Speonk; DH to Jamaica",
+    notes:"Extra Crew"
+  },
+  "474":{
+    terminal:"Babylon Yard", week:{Mon:"277",Tue:"R",Wed:"R",Thu:"200",Fri:"200",Sat:"271",Sun:"271"}
+  }
+};
+
+function blankCoverage(){return {day:"",coverType:"extra",coverJob:""}}
+function blankPeriod(){return {report:"",release:"",service:"",exceptions:[]}}
+function regular(crew,action="revised"){
+ return {id:"regular-"+crew,type:"regular",crew,action,complete:false,terminal:"",
+  relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",
+  weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:""};
+}
+function extra(crew){
+ return {id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,terminal:"",
+ active:"",report:"",release:"",service:"",footnotes:"",notes:""};
+}
+function relief(crew){
+ return {id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,terminal:"",
+ week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:""};
+}
+function abolished(crew){
+ return {id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,notes:""};
+}
+
+function fresh(){
+  const a=regular("277");
+  a.terminal="Babylon Yard";
+  a.relief1={day:"Wednesday",coverType:"job",coverJob:"474"};
+  a.relief2={day:"Thursday",coverType:"job",coverJob:"474"};
+  a.paysMeal="no";
+  const b=regular("203","added");
+  const c=extra("61");
+  const d=relief("474");
+  d.terminal="Babylon Yard";
+  const e=abolished("18");
+  return {
+    schema:"epl-crew-revision-builder-v2",
+    revision:{go:"202",revision:"7",effective:"2026-09-08",generalNotes:""},
+    items:[a,b,c,d,e]
+  };
+}
+let state=load(), currentTab="all";
+function load(){
+ try{const x=localStorage.getItem(KEY);if(x)return JSON.parse(x)}catch(e){}
+ return fresh();
+}
+function save(show=false){
+ localStorage.setItem(KEY,JSON.stringify(state));
+ document.getElementById('saveText').textContent='Saved • '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+ updateProgress(); updatePreview();
+ if(show)toast("Saved");
+}
+function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function cardTitle(i){
+ if(i.type==="regular") return i.action==="added"?"Added Regular Crew":i.action==="abolished"?"Abolished Regular Crew":"Regular Crew";
+ if(i.type==="extra") return "Extra Crew";
+ return "Relief Crew";
+}
+function visible(i){
+ if(currentTab==="all")return true;
+ if(currentTab==="unfinished")return !i.complete;
+ if(currentTab==="added")return i.action==="added";
+ if(currentTab==="abolished")return i.action==="abolished";
+ return i.type===currentTab && !["added","abolished"].includes(i.action);
+}
+function render(){
+ const host=document.getElementById("cards"); host.innerHTML="";
+ state.items.forEach((i,idx)=>{
+   if(!visible(i))return;
+   const c=document.createElement("article");
+   c.className="card"+(i.complete?" done":"");
+   c.dataset.idx=idx;
+   c.innerHTML=`<div class="cardhead" onclick="toggleCard(${idx})">
+      <div class="badge">${i.type==="relief"?"Relief ":"Job "}${esc(i.crew)}</div>
+      <div class="meta"><strong>${cardTitle(i)}</strong><small>${i.complete?"Entry marked complete":"Tap to transcribe / review"}</small></div>
+      <span class="status">${i.complete?"Complete":"Open"}</span><span class="chev">›</span>
+    </div><div class="body">${bodyFor(i,idx)}</div>`;
+   host.appendChild(c);
+ });
+}
+function bodyFor(i,idx){
+ if(i.action==="abolished") return abolishedBody(i,idx);
+ if(i.type==="regular") return regularBody(i,idx);
+ if(i.type==="extra") return extraBody(i,idx);
+ return reliefBody(i,idx);
+}
+function previousBlock(i){
+ const p=PRIOR[i.crew];
+ if(!p)return `<div class="note">No prior verified record is included in this small demo sample. In the real builder, the prior production revision would be loaded automatically when available.</div>`;
+ return `<details class="block readonly"><summary>Previous verified revision ▸</summary><pre>${esc(JSON.stringify(p,null,2))}</pre></details>`;
+}
+function regularBody(i,idx){
+ return `${previousBlock(i)}
+ <div class="section">Complete new assignment</div>
+ <div class="grid2">
+   <div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div>
+   <div><label class="lbl">Pays meal period?</label>
+     <select onchange="setVal(${idx},'paysMeal',this.value)">
+       <option value="" ${!i.paysMeal?'selected':''}>Select…</option>
+       <option value="yes" ${i.paysMeal==="yes"?'selected':''}>Yes</option>
+       <option value="no" ${i.paysMeal==="no"?'selected':''}>No</option>
+     </select>
+   </div>
+ </div>
+ <div class="section">Relief days & who covers them</div>
+ <div class="coverage">
+   ${coverageEditor(i,idx,"relief1","Relief day #1")}
+   ${coverageEditor(i,idx,"relief2","Relief day #2")}
+ </div>
+ <div class="section">Monday–Friday</div>
+ ${periodEditor(i,idx,"weekday")}
+ <div class="section">Saturday–Sunday</div>
+ ${periodEditor(i,idx,"weekend")}
+ <div class="section">Published footnotes / special date ranges</div>
+ <textarea placeholder="Copy the relevant asterisk wording, date range, Friday-report-only note, etc." oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea>
+ <div class="section">Notes for review</div>
+ <textarea placeholder="Example: Saturday into Sunday release time. Asterisk applies to the calendar day after midnight." oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>
+ <div class="note">Use this note field freely. It is exported with the JSON so your interpretation travels with the data instead of being lost.</div>
+ ${diffBlock(i)}
+ ${completeButtons(idx,i)}
+ `;
+}
+function coverageEditor(i,idx,key,title){
+ const c=i[key]||blankCoverage();
+ return `<div class="block">
+   <label class="lbl">${title}</label>
+   <select onchange="setNested(${idx},'${key}','day',this.value)">
+     ${["","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d=>`<option value="${d}" ${c.day===d?'selected':''}>${d||"Select day…"}</option>`).join("")}
+   </select>
+   <div style="height:8px"></div>
+   <label class="lbl">Covered by</label>
+   <select onchange="setCoverType(${idx},'${key}',this.value)">
+     <option value="extra" ${c.coverType==="extra"?'selected':''}>Extra Crew</option>
+     <option value="job" ${c.coverType==="job"?'selected':''}>Job number</option>
+   </select>
+   <div id="coverjob_${idx}_${key}" style="margin-top:8px;${c.coverType==="job"?'':'display:none'}">
+    <label class="lbl">Covering job</label><input inputmode="numeric" value="${esc(c.coverJob)}" placeholder="Example: 474" oninput="setNested(${idx},'${key}','coverJob',this.value)">
+   </div>
+ </div>`;
+}
+function periodEditor(i,idx,key){
+ const p=i[key]||blankPeriod();
+ return `<div class="block">
+   <div class="grid2">
+     <div><label class="lbl">Base report</label><input type="time" value="${esc(p.report)}" oninput="setPeriod(${idx},'${key}','report',this.value)"></div>
+     <div><label class="lbl">Base release</label><input type="time" value="${esc(p.release)}" oninput="setPeriod(${idx},'${key}','release',this.value)"></div>
+   </div>
+   <div style="margin-top:9px">
+     <label class="lbl">Complete trains / service for this portion</label>
+     <textarea placeholder="Transcribe the complete published service, not just what changed." oninput="setPeriod(${idx},'${key}','service',this.value)">${esc(p.service)}</textarea>
+   </div>
+   <div class="section">Day-specific / dated exceptions</div>
+   <div id="exceptions_${idx}_${key}">
+     ${(p.exceptions||[]).map((e,n)=>exceptionEditor(idx,key,n,e)).join("")}
+   </div>
+   <button class="secondary smallbtn" onclick="addException(${idx},'${key}')">+ Add exception</button>
+ </div>`;
+}
+function exceptionEditor(idx,key,n,e){
+ return `<div class="exception">
+   <div class="xrow">
+     <div><label class="lbl">Day / condition</label><input value="${esc(e.day||"")}" placeholder="Friday / Sundays only" oninput="setException(${idx},'${key}',${n},'day',this.value)"></div>
+     <div><label class="lbl">What differs?</label>
+       <select onchange="setException(${idx},'${key}',${n},'field',this.value)">
+         ${["Release","Report","Service","Footnote","Multiple items"].map(x=>`<option ${e.field===x?'selected':''}>${x}</option>`).join("")}
+       </select>
+     </div>
+   </div>
+   <div class="xrow" style="margin-top:8px">
+     <div><label class="lbl">Override / details</label><input value="${esc(e.value||"")}" placeholder="12:53 AM / train changes…" oninput="setException(${idx},'${key}',${n},'value',this.value)"></div>
+     <div><label class="lbl">Date range (optional)</label><input value="${esc(e.range||"")}" placeholder="May 21–Sept. 3" oninput="setException(${idx},'${key}',${n},'range',this.value)"></div>
+   </div>
+   <div style="margin-top:8px"><label class="lbl">Clarifying note (optional)</label><input value="${esc(e.note||"")}" placeholder="Friday report; release occurs Saturday after midnight" oninput="setException(${idx},'${key}',${n},'note',this.value)"></div>
+   <button class="dangerbtn smallbtn" style="margin-top:8px" onclick="removeException(${idx},'${key}',${n})">Remove exception</button>
+ </div>`;
+}
+function extraBody(i,idx){
+ return `${previousBlock(i)}
+ <div class="section">Complete Extra Crew assignment</div>
+ <div class="grid2">
+   <div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div>
+   <div><label class="lbl">Active days / date restrictions</label><input value="${esc(i.active)}" placeholder="Mondays & Tuesday Sept. 8" oninput="setVal(${idx},'active',this.value)"></div>
+   <div><label class="lbl">Report</label><input type="time" value="${esc(i.report)}" oninput="setVal(${idx},'report',this.value)"></div>
+   <div><label class="lbl">Release</label><input type="time" value="${esc(i.release)}" oninput="setVal(${idx},'release',this.value)"></div>
+ </div>
+ <div style="margin-top:9px"><label class="lbl">Complete trains / service</label><textarea oninput="setVal(${idx},'service',this.value)">${esc(i.service)}</textarea></div>
+ <div style="margin-top:9px"><label class="lbl">Footnotes / special dates</label><textarea oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea></div>
+ <div class="section">Notes for review</div>
+ <textarea placeholder="Example: Release exception only applies Oct. 16–Nov. 6." oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>
+ ${diffBlock(i)}
+ ${completeButtons(idx,i)}`;
+}
+function reliefBody(i,idx){
+ return `${previousBlock(i)}
+ <div class="section">Complete Relief Crew table row</div>
+ <div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div>
+ <div class="section">Monday through Sunday</div>
+ <div class="week">
+   ${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="daycell"><label>${d}</label><input value="${esc(i.week[d]||"")}" placeholder="Job / R" oninput="setWeek(${idx},'${d}',this.value)"></div>`).join("")}
+ </div>
+ <div class="note">Enter the covering job number exactly as shown, or <strong>R</strong> for the relief crew's own relief day.</div>
+ <div class="section">Notes for review</div>
+ <textarea placeholder="Anything unusual about this relief crew row…" oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>
+ ${diffBlock(i)}
+ ${completeButtons(idx,i)}`;
+}
+function abolishedBody(i,idx){
+ return `${previousBlock(i)}
+ <div class="note">For an abolished crew, no schedule transcription is needed. Confirm it and add a note if useful.</div>
+ <div class="section">Notes for review</div>
+ <textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>
+ ${completeButtons(idx,i)}`;
+}
+function completeButtons(idx,i){
+ return `<div class="btnrow">
+   <button class="${i.complete?'secondary':'primary'}" onclick="toggleComplete(${idx})">${i.complete?'Mark unfinished':'Mark complete ✓'}</button>
+ </div>`;
+}
+function normalize(v){return v==null?"":String(v).trim()}
+function flatten(obj,prefix="",out={}){
+ if(obj===null||typeof obj!=="object"){out[prefix]=obj;return out}
+ if(Array.isArray(obj)){out[prefix]=JSON.stringify(obj);return out}
+ Object.keys(obj).forEach(k=>flatten(obj[k],prefix?prefix+"."+k:k,out));return out
+}
+function diffFor(i){
+ const p=PRIOR[i.crew]; if(!p)return [];
+ const a=flatten(p), b=flatten(i);
+ const ignore=["id","type","crew","action","complete"];
+ const diffs=[];
+ Object.keys(b).forEach(k=>{
+   if(ignore.includes(k.split(".")[0]))return;
+   if(k.startsWith("weekday.exceptions")||k.startsWith("weekend.exceptions"))return;
+   if(a[k]!==undefined && normalize(a[k])!==normalize(b[k]) && normalize(b[k])!==""){
+     diffs.push(`${k}: ${a[k]||"—"} → ${b[k]}`);
+   }
+ });
+ return diffs.slice(0,12);
+}
+function diffBlock(i){
+ const d=diffFor(i);
+ if(!PRIOR[i.crew])return "";
+ return `<div class="diff"><strong>Automatic comparison preview</strong>
+   ${d.length?`<ul>${d.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<div class="small" style="margin-top:6px">No populated fields differ from the prior sample yet.</div>`}
+ </div>`;
+}
+function toggleCard(idx){
+ const el=document.querySelector(`.card[data-idx="${idx}"]`); if(el)el.classList.toggle("open")
+}
+function setVal(idx,key,v){state.items[idx][key]=v;save()}
+function setNested(idx,key,sub,v){state.items[idx][key][sub]=v;save()}
+function setPeriod(idx,key,sub,v){state.items[idx][key][sub]=v;save()}
+function setWeek(idx,day,v){state.items[idx].week[day]=v;save()}
+function setCoverType(idx,key,v){
+ state.items[idx][key].coverType=v;if(v==="extra")state.items[idx][key].coverJob="";
+ save(); const x=document.getElementById(`coverjob_${idx}_${key}`);if(x)x.style.display=v==="job"?"block":"none";
+}
+function addException(idx,key){
+ state.items[idx][key].exceptions.push({day:"",field:"Release",value:"",range:"",note:""});save();render();reopen(idx)
+}
+function removeException(idx,key,n){state.items[idx][key].exceptions.splice(n,1);save();render();reopen(idx)}
+function setException(idx,key,n,field,v){state.items[idx][key].exceptions[n][field]=v;save()}
+function reopen(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.add("open")}
+function toggleComplete(idx){state.items[idx].complete=!state.items[idx].complete;save(true);render()}
+function setRevision(k,v){state.revision[k]=v;save()}
+function setGeneralNotes(v){state.revision.generalNotes=v;save()}
+function updateProgress(){
+ const n=state.items.filter(x=>x.complete).length,t=state.items.length;
+ document.getElementById("progressText").textContent=`${n} of ${t} complete`;
+ document.getElementById("progressBar").style.width=(n/t*100)+"%";
+}
+function exportData(){
+ return {
+   ...state,
+   exportedAt:new Date().toISOString(),
+   handoffNote:"Complete new-revision transcription. Compare against prior verified dataset; user notes are interpretive aids and source pages remain authoritative."
+ };
+}
+function updatePreview(){document.getElementById("preview").textContent=JSON.stringify(exportData(),null,2)}
+function exportJson(){
+ const blob=new Blob([JSON.stringify(exportData(),null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download=`Crew_Book_GO${state.revision.go}_Rev${state.revision.revision}_progress.json`;
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("JSON backup exported");
+}
+function importJson(file){
+ if(!file)return; const r=new FileReader();
+ r.onload=()=>{try{
+   const x=JSON.parse(r.result);
+   if(!x||!Array.isArray(x.items)||!x.revision)throw new Error("Invalid");
+   state={schema:x.schema||"epl-crew-revision-builder-v2",revision:x.revision,items:x.items};
+   localStorage.setItem(KEY,JSON.stringify(state)); syncHeader();render();updateProgress();updatePreview();toast("Backup imported");
+ }catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};
+ r.readAsText(file); document.getElementById("importFile").value="";
+}
+function resetDemo(){
+ if(!confirm("Reset all prototype entries stored on this device?"))return;
+ state=fresh();localStorage.removeItem(KEY);syncHeader();render();updateProgress();updatePreview();toast("Prototype reset");
+}
+function syncHeader(){
+ document.getElementById("go").value=state.revision.go||"";
+ document.getElementById("rev").value=state.revision.revision||"";
+ document.getElementById("eff").value=state.revision.effective||"";
+ document.getElementById("generalNotes").value=state.revision.generalNotes||"";
+}
+function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentTab=b.dataset.tab;render();
+}));
+syncHeader();render();updateProgress();updatePreview();
+</script>
+</body>
+</html>
