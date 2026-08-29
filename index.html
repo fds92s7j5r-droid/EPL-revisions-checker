@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1117">
-<title>Engineer Pay Log — Crew Book Revision Builder</title>
+<title>Engineer Pay Log — Crew Book Revision Verifier</title>
 <style>
 :root{
  --bg:#0b1117;--panel:#111a22;--panel2:#16222c;--panel3:#0d151c;--input:#0b141b;
@@ -83,6 +83,19 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
 .preview{padding:12px;margin-top:12px}.preview summary{cursor:pointer;font-weight:900}.preview pre{white-space:pre-wrap;word-break:break-word;background:#081017;border:1px solid #263743;border-radius:10px;padding:10px;max-height:330px;overflow:auto;font-size:10.5px;color:#cce4d3}
 .toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%);z-index:60;opacity:0;pointer-events:none;transition:.18s;background:#eaf8ee;color:#13341c;padding:9px 13px;border-radius:999px;font-size:12px;font-weight:900;white-space:nowrap}.toast.show{opacity:1}
 .hidden{display:none!important}
+
+.certbox{background:#101920;border:1px solid #40515d;border-radius:14px;padding:12px;margin:14px 0}
+.certbox.certified{border-color:#3b754c;background:#10261a}
+.certhead{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.certhead strong{font-size:14px}.certhead span{margin-left:auto;font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#293743;color:#c3ced6}
+.certbox.certified .certhead span{background:#1d4a2a;color:#c9f7d4}
+.certcopy{font-size:12px;color:#a9b6c0;line-height:1.45;margin-bottom:9px}
+.certactions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.certactions button{font-size:12px}
+.prefill{display:flex;gap:8px;align-items:flex-start;background:#102433;border:1px solid #31536b;color:#c9e5f8;border-radius:12px;padding:10px;margin-bottom:12px;font-size:12px;line-height:1.45}
+.prefill b{color:#e7f5ff}
+.correctionFlag{margin-top:8px;font-size:11px;color:#efc77d}
+
 @media(min-width:760px){
  .card.open .body.regularLayout{display:grid;grid-template-columns:minmax(300px,42%) 1fr;gap:12px;align-items:start}
  .card.open .body.regularLayout .sourceDock{top:67px}
@@ -101,9 +114,9 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
 <div class="wrap">
 <section class="hero">
  <div class="eyebrow">Engineer Pay Log • Revision Tool</div>
- <h1>Crew Book Revision Builder</h1>
- <p>Designed for one-phone Crew Book revisions: keep the scanned assignment pinned while you transcribe and verify the new assignment below it.</p>
- <div class="demo">DEMO DATA ONLY — the included Job 277 scan is a source-viewer example. This tool does not modify Engineer Pay Log.</div>
+ <h1>Crew Book Revision Verifier</h1>
+ <p>Hybrid revision workflow: assignments are prefilled first, then you verify every job against the pinned Crew Book scan and correct only what needs changing.</p>
+ <div class="demo">PROTOTYPE DATA ONLY — Job 277 demonstrates the final verification workflow. This tool does not modify Engineer Pay Log.</div>
 </section>
 
 <section class="sticky">
@@ -118,7 +131,8 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
  <button class="tab" data-tab="relief">Relief Crews</button>
  <button class="tab" data-tab="added">Added</button>
  <button class="tab" data-tab="abolished">Abolished</button>
- <button class="tab" data-tab="unfinished">Unfinished</button>
+ <button class="tab" data-tab="unfinished">Needs Review</button>
+ <button class="tab" data-tab="certified">Certified</button>
 </div>
 
 <section class="general">
@@ -156,14 +170,33 @@ function movement(type){
 function blankCoverage(){return{day:"",coverType:"extra",coverJob:""}}
 function blankPeriod(){return{report:"",release:"",movements:[],exceptions:[]}}
 function verifyBlank(){return{report:false,relief:false,weekday:false,weekend:false,exceptions:false,footnotes:false}}
-function regular(crew,action="revised"){return{id:"regular-"+crew,type:"regular",crew,action,complete:false,terminal:"",relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:"",verified:verifyBlank()}}
-function extra(crew){return{id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,terminal:"",active:"",report:"",release:"",movements:[],footnotes:"",notes:"",verified:{report:false,weekday:false,footnotes:false}}}
-function relief(crew){return{id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,terminal:"",week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:"",verified:{relief:false}}}
-function abolished(crew){return{id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,notes:"",verified:{}}}
+function regular(crew,action="revised"){return{id:"regular-"+crew,type:"regular",crew,action,complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:"",verified:verifyBlank()}}
+function extra(crew){return{id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",active:"",report:"",release:"",movements:[],footnotes:"",notes:"",verified:{report:false,weekday:false,footnotes:false}}}
+function relief(crew){return{id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:"",verified:{relief:false}}}
+function abolished(crew){return{id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,notes:"",verified:{}}}
 
 function fresh(){
  const a=regular("277"); a.terminal="Babylon Yard";
- a.relief1={day:"Monday",coverType:"job",coverJob:"474"}; a.relief2={day:"Tuesday",coverType:"extra",coverJob:""}; a.paysMeal="no";
+ a.relief1={day:"Monday",coverType:"job",coverJob:"474"}; a.relief2={day:"Tuesday",coverType:"job",coverJob:"474"}; a.paysMeal="no";
+ a.weekday.report="17:42"; a.weekday.release="02:29";
+ a.weekday.movements=[
+  {type:"train",train:"177",from:"Babylon",depart:"18:07",to:"Penn Station",arrive:"19:04",note:""},
+  {type:"train",train:"180",from:"Penn Station",depart:"19:24",to:"Babylon",arrive:"20:30",note:""},
+  {type:"train",train:"193",from:"Babylon",depart:"22:42",to:"Penn Station",arrive:"23:55",note:""},
+  {type:"deadhead",from:"Penn Station",depart:"",to:"Babylon",arrive:"",note:"Published DH to Babylon"},
+  {type:"train",train:"3100",from:"Penn Station",depart:"00:51",to:"Babylon",arrive:"02:09",note:""}
+ ];
+ a.weekend.report="17:47"; a.weekend.release="02:29";
+ a.weekend.movements=[
+  {type:"train",train:"6175",from:"Babylon",depart:"18:12",to:"Penn Station",arrive:"19:17",note:""},
+  {type:"train",train:"7984",from:"Penn Station",depart:"20:18",to:"Ronkonkoma",arrive:"21:40",note:""},
+  {type:"train",train:"7995",from:"Ronkonkoma",depart:"22:32",to:"Penn Station",arrive:"23:54",note:""},
+  {type:"deadhead",from:"Penn Station",depart:"",to:"Babylon",arrive:"",note:"Published DH to Babylon"},
+  {type:"train",train:"3100",from:"Penn Station",depart:"00:51",to:"Babylon",arrive:"02:09",note:""}
+ ];
+ a.weekday.exceptions=[{day:"Saturday condition shown in source",field:"Footnote",value:"* Saturdays Only",range:"",note:"Verify exact applicability against scan"}];
+ a.weekend.exceptions=[{day:"Sunday condition shown in source",field:"Footnote",value:"* Sundays Only",range:"",note:"Verify exact applicability against scan"}];
+ a.notes="Prefilled from the attached source scan for human verification.";
  const b=regular("203","added"),c=extra("61"),d=relief("474");d.terminal="Babylon Yard";
  return{schema:"epl-crew-revision-builder-keeper-v1",revision:{go:"202",revision:"7",effective:"2026-09-08",generalNotes:""},items:[a,b,c,d,abolished("18")]}
 }
@@ -171,7 +204,7 @@ let state=load(),currentTab="all",sourceUI={};
 function load(){try{const x=localStorage.getItem(KEY);if(x)return JSON.parse(x)}catch(e){}return fresh()}
 function save(show=false){localStorage.setItem(KEY,JSON.stringify(state));document.getElementById("saveText").textContent='Saved • '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});updateProgress();updatePreview();if(show)toast("Saved")}
 function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function visible(i){if(currentTab==="all")return true;if(currentTab==="unfinished")return!i.complete;if(currentTab==="added")return i.action==="added";if(currentTab==="abolished")return i.action==="abolished";return i.type===currentTab&&!["added","abolished"].includes(i.action)}
+function visible(i){if(currentTab==="all")return true;if(currentTab==="unfinished")return!i.certification||i.certification==="needs_review";if(currentTab==="certified")return i.certification==="certified_correct"||i.certification==="corrected_and_certified";if(currentTab==="added")return i.action==="added";if(currentTab==="abolished")return i.action==="abolished";return i.type===currentTab&&!["added","abolished"].includes(i.action)}
 function title(i){if(i.type==="regular")return i.action==="added"?"Added Regular Crew":i.action==="abolished"?"Abolished Regular Crew":"Regular Crew";if(i.type==="extra")return"Extra Crew";return"Relief Crew"}
 
 function render(){
@@ -180,7 +213,7 @@ function render(){
   if(!visible(i))return;
   const c=document.createElement("article");c.className="card"+(i.complete?" done":"");c.dataset.idx=idx;
   const layout=(i.type==="regular"&&i.action!=="abolished")?" regularLayout":"";
-  c.innerHTML=`<div class="cardhead" onclick="toggleCard(${idx})"><div class="badge">${i.type==="relief"?"Relief ":"Job "}${esc(i.crew)}</div><div class="meta"><strong>${title(i)}</strong><small>${i.complete?"Entry marked complete":"Tap to transcribe / verify"}</small></div><span class="status">${i.complete?"Complete":"Open"}</span><span class="chev">›</span></div><div class="body${layout}">${bodyFor(i,idx)}</div>`;
+  c.innerHTML=`<div class="cardhead" onclick="toggleCard(${idx})"><div class="badge">${i.type==="relief"?"Relief ":"Job "}${esc(i.crew)}</div><div class="meta"><strong>${title(i)}</strong><small>${(i.certification==="certified_correct"||i.certification==="corrected_and_certified")?"Human verified":"Prefilled • verify against source"}</small></div><span class="status">${i.certification==="certified_correct"?"Certified":i.certification==="corrected_and_certified"?"Corrected ✓":"Review"}</span><span class="chev">›</span></div><div class="body${layout}">${bodyFor(i,idx)}</div>`;
   host.appendChild(c)
  })
 }
@@ -203,7 +236,7 @@ function sourceDock(i,idx){
   </div>
   <div class="sourceViewport">${src?`<img id="sourceimg_${idx}" src="${src}" alt="Scanned source for Job ${esc(i.crew)}" style="width:${Math.round(ui.zoom*100)}%">`:`<div class="noSource">No scan attached in this small demo.<br>In a real revision package, each revised job would arrive with its source crop already attached.</div>`}</div>
   <div class="sourceHint">${src?"Scroll inside the source window to move around the scan. Zoom buttons change the source size while the form remains below.":"Source crops would be generated from the revision PDF before you begin."}</div>
-  ${checks?`<div class="verifyStrip"><div class="verifyGrid">${checks}</div></div>`:""}
+  
  </div>`;
 }
 function ensureUI(i){if(!sourceUI[i.id])sourceUI[i.id]={zoom:1,collapsed:false};return sourceUI[i.id]}
@@ -236,34 +269,49 @@ function periodEditor(i,idx,key){
  return `<div class="block"><div class="grid2"><div><label class="lbl">Base report</label><input type="time" value="${esc(p.report)}" oninput="setPeriod(${idx},'${key}','report',this.value)"></div><div><label class="lbl">Base release</label><input type="time" value="${esc(p.release)}" oninput="setPeriod(${idx},'${key}','release',this.value)"></div></div><div class="section">Assignment lines — published order</div>${movementBuilder(idx,key,p.movements||[])}<div class="section">Day-specific / dated exceptions</div>${(p.exceptions||[]).map((e,n)=>exceptionEditor(idx,key,n,e)).join("")}<button class="secondary smallbtn" onclick="addException(${idx},'${key}')">+ Add exception</button></div>`
 }
 function regularEditor(i,idx){
- return `<div class="section" style="margin-top:0">Complete new assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Pays meal period?</label><select onchange="setVal(${idx},'paysMeal',this.value)"><option value="" ${!i.paysMeal?'selected':''}>Select…</option><option value="yes" ${i.paysMeal==="yes"?'selected':''}>Yes</option><option value="no" ${i.paysMeal==="no"?'selected':''}>No</option></select></div></div><div class="section">Relief days & who covers them</div><div class="coverage">${coverageEditor(i,idx,"relief1","Relief day #1")}${coverageEditor(i,idx,"relief2","Relief day #2")}</div><div class="section">Monday–Friday</div>${periodEditor(i,idx,"weekday")}<div class="section">Saturday–Sunday</div>${periodEditor(i,idx,"weekend")}<div class="section">Published footnotes / special date ranges</div><textarea oninput="setVal(${idx},'footnotes',this.value)" placeholder="Copy assignment-wide asterisk wording/date restrictions…">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)" placeholder="Saturday into Sunday release time; asterisk applies after midnight; anything you want me to understand…">${esc(i.notes)}</textarea><div class="note">Plain-language notes are intentional. You do not need to translate railroad wording into code rules.</div>${completeButton(i,idx)}`
+ return `<div class="prefill"><div>◉</div><div><b>Prefilled assignment</b><br>I populated this record from the source. Check every item against the pinned scan. Change anything that is wrong, then certify the job below.</div></div><div class="section" style="margin-top:0">Complete new assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Pays meal period?</label><select onchange="setVal(${idx},'paysMeal',this.value)"><option value="" ${!i.paysMeal?'selected':''}>Select…</option><option value="yes" ${i.paysMeal==="yes"?'selected':''}>Yes</option><option value="no" ${i.paysMeal==="no"?'selected':''}>No</option></select></div></div><div class="section">Relief days & who covers them</div><div class="coverage">${coverageEditor(i,idx,"relief1","Relief day #1")}${coverageEditor(i,idx,"relief2","Relief day #2")}</div><div class="section">Monday–Friday</div>${periodEditor(i,idx,"weekday")}<div class="section">Saturday–Sunday</div>${periodEditor(i,idx,"weekend")}<div class="section">Published footnotes / special date ranges</div><textarea oninput="setVal(${idx},'footnotes',this.value)" placeholder="Copy assignment-wide asterisk wording/date restrictions…">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)" placeholder="Saturday into Sunday release time; asterisk applies after midnight; anything you want me to understand…">${esc(i.notes)}</textarea><div class="note">Plain-language notes are intentional. You do not need to translate railroad wording into code rules.</div>${completeButton(i,idx)}`
 }
 function extraEditor(i,idx){
- return `<div class="section" style="margin-top:0">Complete Extra Crew assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Active days / date restrictions</label><input value="${esc(i.active)}" oninput="setVal(${idx},'active',this.value)"></div><div><label class="lbl">Report</label><input type="time" value="${esc(i.report)}" oninput="setVal(${idx},'report',this.value)"></div><div><label class="lbl">Release</label><input type="time" value="${esc(i.release)}" oninput="setVal(${idx},'release',this.value)"></div></div><div class="section">Assignment lines</div>${movementBuilder(idx,"movements",i.movements||[])}<div class="section">Footnotes / special dates</div><textarea oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
+ return `<div class="prefill"><div>◉</div><div><b>Prefilled assignment</b><br>I populated this record from the source. Check every item against the pinned scan. Change anything that is wrong, then certify the job below.</div></div><div class="section" style="margin-top:0">Complete Extra Crew assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Active days / date restrictions</label><input value="${esc(i.active)}" oninput="setVal(${idx},'active',this.value)"></div><div><label class="lbl">Report</label><input type="time" value="${esc(i.report)}" oninput="setVal(${idx},'report',this.value)"></div><div><label class="lbl">Release</label><input type="time" value="${esc(i.release)}" oninput="setVal(${idx},'release',this.value)"></div></div><div class="section">Assignment lines</div>${movementBuilder(idx,"movements",i.movements||[])}<div class="section">Footnotes / special dates</div><textarea oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
 }
 function reliefEditor(i,idx){
- return `<div class="section" style="margin-top:0">Complete Relief Crew row</div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"><div class="section">Monday through Sunday</div><div class="week">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="daycell"><label>${d}</label><input value="${esc(i.week[d]||"")}" placeholder="Job / R" oninput="setWeek(${idx},'${d}',this.value)"></div>`).join("")}</div><div class="note">Enter the covered job number exactly as shown, or R for the relief crew's own relief day.</div><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
+ return `<div class="prefill"><div>◉</div><div><b>Prefilled assignment</b><br>I populated this record from the source. Check every item against the pinned scan. Change anything that is wrong, then certify the job below.</div></div><div class="section" style="margin-top:0">Complete Relief Crew row</div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"><div class="section">Monday through Sunday</div><div class="week">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="daycell"><label>${d}</label><input value="${esc(i.week[d]||"")}" placeholder="Job / R" oninput="setWeek(${idx},'${d}',this.value)"></div>`).join("")}</div><div class="note">Enter the covered job number exactly as shown, or R for the relief crew's own relief day.</div><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
 }
-function abolishedEditor(i,idx){return `<div class="note">For an abolished crew, no assignment transcription is needed.</div><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`}
-function completeButton(i,idx){return `<div class="btnrow"><button class="${i.complete?'secondary':'primary'}" onclick="toggleComplete(${idx})">${i.complete?'Mark unfinished':'Mark complete ✓'}</button></div>`}
+function abolishedEditor(i,idx){return `<div class="prefill"><div>◉</div><div><b>Prefilled revision action</b><br>Verify that this crew is actually abolished on the revision notice, then certify it.</div></div><div class="note">For an abolished crew, no assignment transcription is needed.</div><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`}
+function completeButton(i,idx){
+ const certified=i.certification==="certified_correct"||i.certification==="corrected_and_certified";
+ const label=i.certification==="corrected_and_certified"?"Corrected & Certified":i.certification==="certified_correct"?"Certified Correct":"Needs Review";
+ return `<div class="certbox ${certified?'certified':''}">
+  <div class="certhead"><strong>Human verification</strong><span>${label}</span></div>
+  <div class="certcopy">After comparing the entire prefilled record with the pinned Crew Book source, certify it here. If you edited any prefilled field, use Corrected & Certified.</div>
+  <div class="certactions">
+   <button class="primary" onclick="certify(${idx},'certified_correct')">✓ Certified Correct</button>
+   <button class="bluebtn" onclick="certify(${idx},'corrected_and_certified')">✎ Corrected & Certified</button>
+  </div>
+  ${i.userCorrections?'<div class="correctionFlag">This record contains human corrections to the prefilled data.</div>':''}
+  ${certified?`<button class="secondary smallbtn" style="margin-top:8px;width:100%" onclick="certify(${idx},'needs_review')">Return to Needs Review</button>`:''}
+ </div>`;
+}
 
 function toggleCard(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.toggle("open")}
 function reopen(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.add("open")}
-function setVal(idx,k,v){state.items[idx][k]=v;save()} function setNested(idx,k,s,v){state.items[idx][k][s]=v;save()}
-function setPeriod(idx,k,s,v){state.items[idx][k][s]=v;save()} function setWeek(idx,d,v){state.items[idx].week[d]=v;save()}
-function setCoverType(idx,k,v){state.items[idx][k].coverType=v;if(v==="extra")state.items[idx][k].coverJob="";save();const x=document.getElementById(`coverjob_${idx}_${k}`);if(x)x.style.display=v==="job"?"block":"none"}
+function markCorrection(idx){const i=state.items[idx];i.userCorrections=true;if(i.certification==="certified_correct"||i.certification==="corrected_and_certified"){i.certification="needs_review";i.complete=false;i.certifiedAt=null}}
+function setVal(idx,k,v){markCorrection(idx);state.items[idx][k]=v;save()} function setNested(idx,k,s,v){markCorrection(idx);state.items[idx][k][s]=v;save()}
+function setPeriod(idx,k,s,v){markCorrection(idx);state.items[idx][k][s]=v;save()} function setWeek(idx,d,v){markCorrection(idx);state.items[idx].week[d]=v;save()}
+function setCoverType(idx,k,v){markCorrection(idx);state.items[idx][k].coverType=v;if(v==="extra")state.items[idx][k].coverJob="";save();const x=document.getElementById(`coverjob_${idx}_${k}`);if(x)x.style.display=v==="job"?"block":"none"}
 function getMoveArray(idx,section){const i=state.items[idx];return section==="movements"?i.movements:i[section].movements}
-function addMovement(idx,section,type){getMoveArray(idx,section).push(movement(type));save();render();reopen(idx)}
-function removeMovement(idx,section,n){getMoveArray(idx,section).splice(n,1);save();render();reopen(idx)}
-function moveLine(idx,section,n,d){const a=getMoveArray(idx,section),to=n+d;if(to<0||to>=a.length)return;[a[n],a[to]]=[a[to],a[n]];save();render();reopen(idx)}
-function setMovement(idx,section,n,k,v){getMoveArray(idx,section)[n][k]=v;save()}
-function addException(idx,k){state.items[idx][k].exceptions.push({day:"",field:"Release",value:"",range:"",note:""});save();render();reopen(idx)}
-function removeException(idx,k,n){state.items[idx][k].exceptions.splice(n,1);save();render();reopen(idx)}
-function setException(idx,k,n,f,v){state.items[idx][k].exceptions[n][f]=v;save()}
+function addMovement(idx,section,type){markCorrection(idx);getMoveArray(idx,section).push(movement(type));save();render();reopen(idx)}
+function removeMovement(idx,section,n){markCorrection(idx);getMoveArray(idx,section).splice(n,1);save();render();reopen(idx)}
+function moveLine(idx,section,n,d){markCorrection(idx);const a=getMoveArray(idx,section),to=n+d;if(to<0||to>=a.length)return;[a[n],a[to]]=[a[to],a[n]];save();render();reopen(idx)}
+function setMovement(idx,section,n,k,v){markCorrection(idx);getMoveArray(idx,section)[n][k]=v;save()}
+function addException(idx,k){markCorrection(idx);state.items[idx][k].exceptions.push({day:"",field:"Release",value:"",range:"",note:""});save();render();reopen(idx)}
+function removeException(idx,k,n){markCorrection(idx);state.items[idx][k].exceptions.splice(n,1);save();render();reopen(idx)}
+function setException(idx,k,n,f,v){markCorrection(idx);state.items[idx][k].exceptions[n][f]=v;save()}
 function toggleComplete(idx){state.items[idx].complete=!state.items[idx].complete;save(true);render()}
+function certify(idx,status){const i=state.items[idx];i.certification=status;i.complete=status!=="needs_review";i.certifiedAt=i.complete?new Date().toISOString():null;if(status==="corrected_and_certified")i.userCorrections=true;save(true);render();reopen(idx)}
 function setRevision(k,v){state.revision[k]=v;save()} function setGeneralNotes(v){state.revision.generalNotes=v;save()}
-function updateProgress(){const n=state.items.filter(x=>x.complete).length,t=state.items.length;document.getElementById("progressText").textContent=`${n} of ${t} complete`;document.getElementById("progressBar").style.width=(n/t*100)+"%"}
-function exportData(){return{...state,exportedAt:new Date().toISOString(),handoffNote:"Full new-revision transcription with ordered movements, source-verification checklist, and reviewer notes. Official Crew Book scan remains authoritative."}}
+function updateProgress(){const n=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length,t=state.items.length;document.getElementById("progressText").textContent=`${n} of ${t} certified`;document.getElementById("progressBar").style.width=(n/t*100)+"%"}
+function exportData(){const certified=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length;return{...state,certificationSummary:{certified,total:state.items.length,allCertified:certified===state.items.length},exportedAt:new Date().toISOString(),handoffNote:"Hybrid assistant-prefill + human-certification handoff. Every certified job was compared by the user against its pinned official Crew Book source. The structured assignment in this JSON is the human-verified record for patch generation."}}
 function updatePreview(){document.getElementById("preview").textContent=JSON.stringify(exportData(),null,2)}
 function exportJson(){const b=new Blob([JSON.stringify(exportData(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`Crew_Book_GO${state.revision.go}_Rev${state.revision.revision}_progress.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("JSON backup exported")}
 function importJson(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw 0;state={schema:x.schema||"epl-crew-revision-builder-keeper-v1",revision:x.revision,items:x.items};localStorage.setItem(KEY,JSON.stringify(state));syncHeader();render();updateProgress();updatePreview();toast("Backup imported")}catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};r.readAsText(file);document.getElementById("importFile").value=""}
