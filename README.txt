@@ -1,52 +1,59 @@
 Engineer Pay Log — Crew Book Revision Verifier
-FINAL HYBRID WORKFLOW CONCEPT
-
-This standalone tool does not modify Engineer Pay Log.
+BASELINE PRODUCTION
 
 Purpose
 -------
-Future Crew Book revisions use a hybrid assistant + human verification workflow.
+This is the baseline production tool for future Crew Book revisions.
 
-1. User supplies the revision PDF/cover.
+Workflow
+--------
+1. User supplies a revision PDF/cover.
 2. Revised / Added / Abolished crews are identified.
-3. Source images/crops are attached to each job.
-4. Assistant pre-fills every structured job record to the best of its ability.
-5. User reviews EVERY job against the pinned official source image.
-6. If prefilled data is wrong, user edits only the applicable field/line.
-7. User certifies each job as:
+3. Official assignment scans/crops are attached to the corresponding job cards.
+4. Assistant pre-fills every structured record to the best of its ability.
+5. User reviews EVERY job against the pinned official Crew Book source.
+6. If a prefilled item is wrong, the user edits only that field/line.
+7. User certifies each job as either:
    - Certified Correct
    - Corrected & Certified
-8. Certified cards can be filtered separately.
-9. If a certified record is edited later, it automatically returns to Needs Review.
-10. JSON export includes:
-   - complete structured assignments
-   - certification state
-   - certification timestamp
-   - whether human corrections were made
-   - revision-wide certification summary
-11. The returned fully certified JSON is treated as the human-verified structured source for creating the app revision patch.
+8. Any edit after certification automatically returns the record to Needs Review.
+9. Exported JSON becomes the human-verified structured source used to create the revision patch.
 
-Mobile design
--------------
-- Source image remains pinned while the form scrolls.
-- Verification controls are NOT part of the pinned source area.
-- Source can be zoomed, scrolled, fit, or hidden.
+Crew Equipment Move Notes
+-------------------------
+These are stored as structured data on each train line in `equipmentMoveCode`.
+
+c = Unless otherwise directed, train will originate or terminate in Penn Station C Yard.
+t = Unless otherwise directed, train will originate or terminate in GCM Tail Track.
+v = Unless otherwise directed, train will originate or terminate in Flatbush Ave. VD Yard.
+w = Unless otherwise directed, train will originate or terminate in J. D. Caemmerer West Side Yard.
+y = Unless otherwise directed, train will originate or terminate in Jamaica Yard.
+
+This structured field is intentionally separate from free-text notes so Crew Book Assistance and Time Slip Assistance can use the yard/origin/termination information programmatically later.
+
+Mobile UX
+---------
+- Official source remains pinned while the form scrolls.
+- Verification/certification controls scroll with the form, not the pinned source.
+- Source image supports zoom, fit, scroll, and hide.
 - Desktop/tablet becomes side-by-side automatically.
 
-Structured assignment support
------------------------------
+Structured data
+---------------
 - Regular crews
 - Added crews
 - Abolished crews
 - Extra crews
 - Relief crews
-- Two independent relief days and covering job/Extra Crew
+- Independent relief-day coverage
 - Mon-Fri and Sat-Sun base assignments
 - Ordered Train / Deadhead / Note movement lines
+- Structured Crew Equipment Move Notes (c/t/v/w/y)
 - Day/date-specific exceptions
 - Footnotes and special date ranges
 - Reviewer notes
 - Local autosave
 - JSON import/export
+- Human certification metadata
 
-The included Job 277 is prefilled as a working demonstration of the hybrid verification workflow.
+The included Job 277 remains a working example of the hybrid verification workflow.

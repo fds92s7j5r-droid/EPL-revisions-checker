@@ -96,6 +96,12 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
 .prefill b{color:#e7f5ff}
 .correctionFlag{margin-top:8px;font-size:11px;color:#efc77d}
 
+.equipcode{margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.equipcode label{font-size:11px;color:#9fb0bc;font-weight:800}
+.equipcode select{width:auto;min-width:210px}
+.codehint{font-size:10px;color:#8fa2af;line-height:1.35;margin-top:5px}
+
+
 @media(min-width:760px){
  .card.open .body.regularLayout{display:grid;grid-template-columns:minmax(300px,42%) 1fr;gap:12px;align-items:start}
  .card.open .body.regularLayout .sourceDock{top:67px}
@@ -163,42 +169,41 @@ const SOURCE_IMAGES={"277":"assets/job277_source.png"};
 const VERIFY_LABELS=[["report","Report"],["relief","Relief coverage"],["weekday","Mon–Fri lines"],["weekend","Sat–Sun lines"],["exceptions","Exceptions"],["footnotes","Footnotes"]];
 
 function movement(type){
- if(type==="train")return{type:"train",train:"",from:"",depart:"",to:"",arrive:"",note:""};
+ if(type==="train")return{type:"train",train:"",from:"",depart:"",to:"",arrive:"",equipmentMoveCode:"",note:""};
  if(type==="deadhead")return{type:"deadhead",from:"",depart:"",to:"",arrive:"",note:""};
  return{type:"note",text:""};
 }
 function blankCoverage(){return{day:"",coverType:"extra",coverJob:""}}
 function blankPeriod(){return{report:"",release:"",movements:[],exceptions:[]}}
-function verifyBlank(){return{report:false,relief:false,weekday:false,weekend:false,exceptions:false,footnotes:false}}
-function regular(crew,action="revised"){return{id:"regular-"+crew,type:"regular",crew,action,complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:"",verified:verifyBlank()}}
-function extra(crew){return{id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",active:"",report:"",release:"",movements:[],footnotes:"",notes:"",verified:{report:false,weekday:false,footnotes:false}}}
-function relief(crew){return{id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:"",verified:{relief:false}}}
-function abolished(crew){return{id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,notes:"",verified:{}}}
+function regular(crew,action="revised"){return{id:"regular-"+crew,type:"regular",crew,action,complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:""}}
+function extra(crew){return{id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",active:"",report:"",release:"",movements:[],footnotes:"",notes:""}}
+function relief(crew){return{id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:""}}
+function abolished(crew){return{id:"abolished-"+crew,type:"regular",crew,action:"abolished",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,notes:""}}
 
 function fresh(){
  const a=regular("277"); a.terminal="Babylon Yard";
  a.relief1={day:"Monday",coverType:"job",coverJob:"474"}; a.relief2={day:"Tuesday",coverType:"job",coverJob:"474"}; a.paysMeal="no";
  a.weekday.report="17:42"; a.weekday.release="02:29";
  a.weekday.movements=[
-  {type:"train",train:"177",from:"Babylon",depart:"18:07",to:"Penn Station",arrive:"19:04",note:""},
-  {type:"train",train:"180",from:"Penn Station",depart:"19:24",to:"Babylon",arrive:"20:30",note:""},
-  {type:"train",train:"193",from:"Babylon",depart:"22:42",to:"Penn Station",arrive:"23:55",note:""},
+  {type:"train",train:"177",from:"Babylon",depart:"18:07",to:"Penn Station",arrive:"19:04",equipmentMoveCode:"",note:""},
+  {type:"train",train:"180",from:"Penn Station",depart:"19:24",to:"Babylon",arrive:"20:30",equipmentMoveCode:"",note:""},
+  {type:"train",train:"193",from:"Babylon",depart:"22:42",to:"Penn Station",arrive:"23:55",equipmentMoveCode:"w",note:""},
   {type:"deadhead",from:"Penn Station",depart:"",to:"Babylon",arrive:"",note:"Published DH to Babylon"},
-  {type:"train",train:"3100",from:"Penn Station",depart:"00:51",to:"Babylon",arrive:"02:09",note:""}
+  {type:"train",train:"3100",from:"Penn Station",depart:"00:51",to:"Babylon",arrive:"02:09",equipmentMoveCode:"w",note:""}
  ];
  a.weekend.report="17:47"; a.weekend.release="02:29";
  a.weekend.movements=[
-  {type:"train",train:"6175",from:"Babylon",depart:"18:12",to:"Penn Station",arrive:"19:17",note:""},
-  {type:"train",train:"7984",from:"Penn Station",depart:"20:18",to:"Ronkonkoma",arrive:"21:40",note:""},
-  {type:"train",train:"7995",from:"Ronkonkoma",depart:"22:32",to:"Penn Station",arrive:"23:54",note:""},
+  {type:"train",train:"6175",from:"Babylon",depart:"18:12",to:"Penn Station",arrive:"19:17",equipmentMoveCode:"w",note:""},
+  {type:"train",train:"7984",from:"Penn Station",depart:"20:18",to:"Ronkonkoma",arrive:"21:40",equipmentMoveCode:"w",note:""},
+  {type:"train",train:"7995",from:"Ronkonkoma",depart:"22:32",to:"Penn Station",arrive:"23:54",equipmentMoveCode:"w",note:""},
   {type:"deadhead",from:"Penn Station",depart:"",to:"Babylon",arrive:"",note:"Published DH to Babylon"},
-  {type:"train",train:"3100",from:"Penn Station",depart:"00:51",to:"Babylon",arrive:"02:09",note:""}
+  {type:"train",train:"3100",from:"Penn Station",depart:"00:51",to:"Babylon",arrive:"02:09",equipmentMoveCode:"w",note:""}
  ];
  a.weekday.exceptions=[{day:"Saturday condition shown in source",field:"Footnote",value:"* Saturdays Only",range:"",note:"Verify exact applicability against scan"}];
  a.weekend.exceptions=[{day:"Sunday condition shown in source",field:"Footnote",value:"* Sundays Only",range:"",note:"Verify exact applicability against scan"}];
  a.notes="Prefilled from the attached source scan for human verification.";
  const b=regular("203","added"),c=extra("61"),d=relief("474");d.terminal="Babylon Yard";
- return{schema:"epl-crew-revision-builder-keeper-v1",revision:{go:"202",revision:"7",effective:"2026-09-08",generalNotes:""},items:[a,b,c,d,abolished("18")]}
+ return{schema:"epl-crew-revision-verifier-v1",revision:{go:"202",revision:"7",effective:"2026-09-08",generalNotes:""},items:[a,b,c,d,abolished("18")]}
 }
 let state=load(),currentTab="all",sourceUI={};
 function load(){try{const x=localStorage.getItem(KEY);if(x)return JSON.parse(x)}catch(e){}return fresh()}
@@ -253,7 +258,14 @@ function movementSummary(m){if(m.type==="train")return[m.train?`Train ${m.train}
 function movementEditor(idx,section,n,m){
  const pill=m.type==="train"?"TRAIN":m.type==="deadhead"?"DEADHEAD":"NOTE",pillcls=m.type==="deadhead"?"dh":m.type==="note"?"note":"";
  let fields="";
- if(m.type==="train")fields=`<div class="grid2"><div><label class="lbl">Train number</label><input inputmode="numeric" value="${esc(m.train)}" placeholder="6036" oninput="setMovement(${idx},'${section}',${n},'train',this.value)"></div><div><label class="lbl">Origin</label><input value="${esc(m.from)}" placeholder="Babylon" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div><div><label class="lbl">Departure</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div><div><label class="lbl">Destination</label><input value="${esc(m.to)}" placeholder="Penn Station" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div><div><label class="lbl">Arrival</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div><div><label class="lbl">Line note</label><input value="${esc(m.note)}" placeholder="Starred / equipment note…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"></div></div>`;
+ if(m.type==="train")fields=`<div class="grid2"><div><label class="lbl">Train number</label><input inputmode="numeric" value="${esc(m.train)}" placeholder="6036" oninput="setMovement(${idx},'${section}',${n},'train',this.value)"></div><div><label class="lbl">Origin</label><input value="${esc(m.from)}" placeholder="Babylon" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div><div><label class="lbl">Departure</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div><div><label class="lbl">Destination</label><input value="${esc(m.to)}" placeholder="Penn Station" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div><div><label class="lbl">Arrival</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div><div><label class="lbl">Line note</label><input value="${esc(m.note)}" placeholder="Starred / equipment note…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"><div class="equipcode"><label>Equipment move code</label><select onchange="setMovement(${idx},'${section}',${n},'equipmentMoveCode',this.value)">
+<option value="" ${!m.equipmentMoveCode?'selected':''}>None</option>
+<option value="c" ${m.equipmentMoveCode==='c'?'selected':''}>c — Penn Station C Yard</option>
+<option value="t" ${m.equipmentMoveCode==='t'?'selected':''}>t — GCM Tail Track</option>
+<option value="v" ${m.equipmentMoveCode==='v'?'selected':''}>v — Flatbush Ave. VD Yard</option>
+<option value="w" ${m.equipmentMoveCode==='w'?'selected':''}>w — J. D. Caemmerer West Side Yard</option>
+<option value="y" ${m.equipmentMoveCode==='y'?'selected':''}>y — Jamaica Yard</option>
+</select></div><div class="codehint">Crew Equipment Move Note. Unless otherwise directed, this train originates or terminates at the selected yard/location.</div></div></div>`;
  else if(m.type==="deadhead")fields=`<div class="grid2"><div><label class="lbl">From</label><input value="${esc(m.from)}" oninput="setMovement(${idx},'${section}',${n},'from',this.value)"></div><div><label class="lbl">To</label><input value="${esc(m.to)}" oninput="setMovement(${idx},'${section}',${n},'to',this.value)"></div><div><label class="lbl">Start time (if shown)</label><input type="time" value="${esc(m.depart)}" oninput="setMovement(${idx},'${section}',${n},'depart',this.value)"></div><div><label class="lbl">End time (if shown)</label><input type="time" value="${esc(m.arrive)}" oninput="setMovement(${idx},'${section}',${n},'arrive',this.value)"></div></div><div style="margin-top:8px"><label class="lbl">Deadhead note</label><input value="${esc(m.note)}" placeholder="Sundays only…" oninput="setMovement(${idx},'${section}',${n},'note',this.value)"></div>`;
  else fields=`<label class="lbl">Published line / note</label><textarea oninput="setMovement(${idx},'${section}',${n},'text',this.value)" placeholder="* Saturdays Only / change ends / other published note">${esc(m.text)}</textarea>`;
  return `<div class="movement"><div class="movehead"><div class="moveindex">${n+1}</div><span class="kindpill ${pillcls}">${pill}</span><div class="movetype">${esc(movementSummary(m))}</div><div class="moveactions"><button class="secondary" onclick="moveLine(${idx},'${section}',${n},-1)">↑</button><button class="secondary" onclick="moveLine(${idx},'${section}',${n},1)">↓</button><button class="dangerbtn" onclick="removeMovement(${idx},'${section}',${n})">×</button></div></div><div class="movebody">${fields}</div></div>`
@@ -311,10 +323,10 @@ function toggleComplete(idx){state.items[idx].complete=!state.items[idx].complet
 function certify(idx,status){const i=state.items[idx];i.certification=status;i.complete=status!=="needs_review";i.certifiedAt=i.complete?new Date().toISOString():null;if(status==="corrected_and_certified")i.userCorrections=true;save(true);render();reopen(idx)}
 function setRevision(k,v){state.revision[k]=v;save()} function setGeneralNotes(v){state.revision.generalNotes=v;save()}
 function updateProgress(){const n=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length,t=state.items.length;document.getElementById("progressText").textContent=`${n} of ${t} certified`;document.getElementById("progressBar").style.width=(n/t*100)+"%"}
-function exportData(){const certified=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length;return{...state,certificationSummary:{certified,total:state.items.length,allCertified:certified===state.items.length},exportedAt:new Date().toISOString(),handoffNote:"Hybrid assistant-prefill + human-certification handoff. Every certified job was compared by the user against its pinned official Crew Book source. The structured assignment in this JSON is the human-verified record for patch generation."}}
+function exportData(){const certified=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length;return{...state,certificationSummary:{certified,total:state.items.length,allCertified:certified===state.items.length},exportedAt:new Date().toISOString(),handoffNote:"Hybrid assistant-prefill + human-certification handoff. Every certified job was compared by the user against its pinned official Crew Book source. Structured train records preserve Crew Equipment Move Notes (c/t/v/w/y). The structured assignment in this JSON is the human-verified record for patch generation."}}
 function updatePreview(){document.getElementById("preview").textContent=JSON.stringify(exportData(),null,2)}
 function exportJson(){const b=new Blob([JSON.stringify(exportData(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`Crew_Book_GO${state.revision.go}_Rev${state.revision.revision}_progress.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("JSON backup exported")}
-function importJson(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw 0;state={schema:x.schema||"epl-crew-revision-builder-keeper-v1",revision:x.revision,items:x.items};localStorage.setItem(KEY,JSON.stringify(state));syncHeader();render();updateProgress();updatePreview();toast("Backup imported")}catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};r.readAsText(file);document.getElementById("importFile").value=""}
+function importJson(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw 0;state={schema:x.schema||"epl-crew-revision-verifier-v1",revision:x.revision,items:x.items};localStorage.setItem(KEY,JSON.stringify(state));syncHeader();render();updateProgress();updatePreview();toast("Backup imported")}catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};r.readAsText(file);document.getElementById("importFile").value=""}
 function resetDemo(){if(!confirm("Reset all entries stored on this device?"))return;state=fresh();sourceUI={};localStorage.removeItem(KEY);syncHeader();render();updateProgress();updatePreview();toast("Builder reset")}
 function syncHeader(){document.getElementById("go").value=state.revision.go||"";document.getElementById("rev").value=state.revision.revision||"";document.getElementById("eff").value=state.revision.effective||"";document.getElementById("generalNotes").value=state.revision.generalNotes||""}
 function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
