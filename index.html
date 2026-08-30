@@ -90,6 +90,13 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
 .certhead strong{font-size:14px}.certhead span{margin-left:auto;font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#293743;color:#c3ced6}
 .certbox.certified .certhead span{background:#1d4a2a;color:#c9f7d4}
 .certcopy{font-size:12px;color:#a9b6c0;line-height:1.45;margin-bottom:9px}
+.verifylist{display:grid;gap:7px;margin:10px 0 12px}
+.verifyitem{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid #344651;border-radius:11px;background:#0c151c;cursor:pointer;user-select:none}
+.verifyitem.checked{border-color:#3b754c;background:#10261a}
+.verifyitem input{width:19px;height:19px;min-width:19px;margin:1px 0 0;accent-color:#52d17b}
+.verifyitem span{font-size:12px;line-height:1.35;color:#d3dde4}
+.verifyitem.checked span{color:#d9f6e1;font-weight:800}
+.verifytitle{font-size:11px;color:#9fb0bc;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin:8px 0 5px}
 .certactions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .certactions button{font-size:12px}
 .prefill{display:flex;gap:8px;align-items:flex-start;background:#102433;border:1px solid #31536b;color:#c9e5f8;border-radius:12px;padding:10px;margin-bottom:12px;font-size:12px;line-height:1.45}
@@ -271,6 +278,10 @@ function completeButton(i,idx){
  return `<div class="certbox ${certified?'certified':''}">
   <div class="certhead"><strong>Human verification</strong><span>${label}</span></div>
   <div class="certcopy">Certification is locked until every verification box is checked, including train-number/day consistency. If you edited any prefilled field, use Corrected & Certified.</div>
+  <div class="verifytitle">Verification checklist</div>
+  <div class="verifylist">
+   ${VERIFY_LABELS.map(([k,l])=>`<label class="verifyitem ${i.verified?.[k]?'checked':''}"><input type="checkbox" ${i.verified?.[k]?'checked':''} onchange="setVerified(${idx},'${k}',this.checked)"><span>${esc(l)}</span></label>`).join('')}
+  </div>
   <div class="certactions">
    <button class="primary" onclick="certify(${idx},'certified_correct')">✓ Certified Correct</button>
    <button class="bluebtn" onclick="certify(${idx},'corrected_and_certified')">✎ Corrected & Certified</button>
@@ -283,6 +294,15 @@ function completeButton(i,idx){
 function toggleCard(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.toggle("open")}
 function reopen(idx){const el=document.querySelector(`.card[data-idx="${idx}"]`);if(el)el.classList.add("open")}
 function markCorrection(idx){const i=state.items[idx];i.userCorrections=true;if(i.certification==="certified_correct"||i.certification==="corrected_and_certified"){i.certification="needs_review";i.complete=false;i.certifiedAt=null}}
+function setVerified(idx,key,value){
+  const i=state.items[idx];
+  if(!i.verified)i.verified={};
+  i.verified[key]=!!value;
+  if((i.certification==="certified_correct"||i.certification==="corrected_and_certified")&&!value){
+    i.certification="needs_review";i.complete=false;i.certifiedAt=null;
+  }
+  save(true);render();reopen(idx);
+}
 function setVal(idx,k,v){markCorrection(idx);state.items[idx][k]=v;save()} function setNested(idx,k,s,v){markCorrection(idx);state.items[idx][k][s]=v;save()}
 function setPeriod(idx,k,s,v){markCorrection(idx);state.items[idx][k][s]=v;save()} function setWeek(idx,d,v){markCorrection(idx);state.items[idx].week[d]=v;save()}
 function setCoverType(idx,k,v){markCorrection(idx);state.items[idx][k].coverType=v;if(v==="extra")state.items[idx][k].coverJob="";save();const x=document.getElementById(`coverjob_${idx}_${k}`);if(x)x.style.display=v==="job"?"block":"none"}
