@@ -162,6 +162,7 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
  <div class="note"><strong>Priority group first:</strong> Jobs 9, 12, 51, 134, 161, 200, 216, 293, and 358 contain explicit Friday-only wording in the source. Job 200 is already pre-corrected in this candidate. After those, continue through every other job with custom Rev. 6 resolver logic.</div>
 </section>
 <div class="private-save-warning"><strong>Autosave safety:</strong> Use normal Safari for this audit. Private Browsing may discard local website storage when Safari is suspended or the private session is torn down. Progress is mirrored to two browser stores, but Private Browsing cannot be guaranteed durable. Use Export JSON for an extra checkpoint during long reviews.</div>
+<div class="private-save-warning"><strong>Meal-status model corrected:</strong> Monday–Friday and Saturday–Sunday have separate meal fields. Day/date exceptions can also override meal status. Older JSON can be imported without losing your other corrections.</div>
 <main id="cards"></main>
 <details class="preview"><summary>Preview JSON backup / handoff file</summary><pre id="preview"></pre></details>
 </div>
@@ -175,9 +176,9 @@ button{border:0;border-radius:11px;padding:10px 12px;font:inherit;font-weight:85
 <div id="toast" class="toast">Saved</div>
 
 <script>
-const KEY="eplCrewRevisionVerifier_GO201_Rev6_recert_v1";
+const KEY="eplCrewRevisionVerifier_GO201_Rev6_recert_v2_meals_by_period";
 const SOURCE_IMAGES={"1":"assets/page_006.jpg","2":"assets/page_006.jpg","9":"assets/page_010.jpg","10":"assets/page_010.jpg","12":"assets/page_011.jpg","13":"assets/page_012.jpg","14":"assets/page_013.jpg","17":"assets/page_014.jpg","18":"assets/page_014.jpg","32":"assets/page_017.jpg","38":"assets/page_019.jpg","42":"assets/page_021.jpg","43":"assets/page_021.jpg","47":"assets/page_023.jpg","51":"assets/page_024.jpg","52":"assets/page_025.jpg","53":"assets/page_025.jpg","100":"assets/page_039.jpg","104":"assets/page_042.jpg","109":"assets/page_046.jpg","112":"assets/page_048.jpg","113":"assets/page_048.jpg","127":"assets/page_053.jpg","134":"assets/page_056.jpg","138":"assets/page_058.jpg","161":"assets/page_066.jpg","170":"assets/page_070.jpg","178":"assets/page_075.jpg","179":"assets/page_076.jpg","181":"assets/page_078.jpg","182":"assets/page_079.jpg","191":"assets/page_081.jpg","199":"assets/page_086.jpg","200":"assets/page_087.jpg","216":"assets/page_089.jpg","233":"assets/page_093.jpg","241":"assets/page_097.jpg","243":"assets/page_098.jpg","271":"assets/page_107.jpg","273":"assets/page_109.jpg","275":"assets/page_111.jpg","277":"assets/page_112.jpg","285":"assets/page_113.jpg","286":"assets/page_113.jpg","289":"assets/page_114.jpg","293":"assets/page_116.jpg","311":"assets/page_122.jpg","312":"assets/page_122.jpg","324":"assets/page_127.jpg","328":"assets/page_130.jpg","333":"assets/page_131.jpg","334":"assets/page_132.jpg","352":"assets/page_138.jpg","354":"assets/page_139.jpg","356":"assets/page_140.jpg","358":"assets/page_141.jpg"};
-const VERIFY_LABELS=[["report","Report / release"],["relief","Relief coverage"],["weekday","Mon-Fri schedule"],["weekend","Sat-Sun schedule"],["exceptions","Day/date exceptions"],["footnotes","Footnotes / stars"],["trainDays","Train numbers vs operating day"]];
+const VERIFY_LABELS=[["report","Report / release"],["relief","Relief coverage"],["weekday","Mon-Fri schedule"],["weekdayMeal","Mon-Fri meal status"],["weekend","Sat-Sun schedule"],["weekendMeal","Sat-Sun meal status"],["exceptions","Day/date exceptions"],["footnotes","Footnotes / stars"],["trainDays","Train numbers vs operating day"]];
 
 function movement(type){
  if(type==="train")return{type:"train",train:"",from:"",depart:"",to:"",arrive:"",equipmentMoveCode:"",note:""};
@@ -185,7 +186,7 @@ function movement(type){
  return{type:"note",text:""};
 }
 function blankCoverage(){return{day:"",coverType:"extra",coverJob:""}}
-function blankPeriod(){return{report:"",release:"",movements:[],exceptions:[]}}
+function blankPeriod(){return{report:"",release:"",paysMeal:"",movements:[],exceptions:[]}}
 function regular(crew,action="revised"){return{id:"regular-"+crew,type:"regular",crew,action,complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",relief1:blankCoverage(),relief2:blankCoverage(),paysMeal:"",weekday:blankPeriod(),weekend:blankPeriod(),footnotes:"",notes:""}}
 function extra(crew){return{id:"extra-"+crew,type:"extra",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",active:"",report:"",release:"",movements:[],footnotes:"",notes:""}}
 function relief(crew){return{id:"relief-"+crew,type:"relief",crew,action:"revised",complete:false,prefilledBy:"assistant",certification:"needs_review",certifiedAt:null,userCorrections:false,terminal:"",week:{Mon:"",Tue:"",Wed:"",Thu:"",Fri:"",Sat:"",Sun:""},notes:""}}
@@ -232,11 +233,52 @@ async function idbReadState(){
     });
   }catch(e){return null}
 }
-function load(){try{const x=localStorage.getItem(KEY);if(x)return JSON.parse(x)}catch(e){}return fresh()}
+function normalizeState(x){
+ if(!x||!Array.isArray(x.items))return x;
+ let legacyMealSchema=false;
+ x.items.forEach(i=>{
+  if(i.type!=="regular")return;
+  i.weekday=i.weekday||blankPeriod();
+  i.weekend=i.weekend||blankPeriod();
+  if(!Object.prototype.hasOwnProperty.call(i.weekday,"paysMeal"))i.weekday.paysMeal="";
+  if(!Object.prototype.hasOwnProperty.call(i.weekend,"paysMeal"))i.weekend.paysMeal="";
+  [i.weekday,i.weekend].forEach(p=>{
+    (p.exceptions||[]).forEach(e=>{
+      if(!Object.prototype.hasOwnProperty.call(e,"mealOverride")){
+        const txt=String(e.value||"");
+        e.mealOverride=/meal\s*=\s*yes/i.test(txt)?"yes":/meal\s*=\s*no/i.test(txt)?"no":"";
+      }
+    });
+  });
+  if(Object.prototype.hasOwnProperty.call(i,"paysMeal")){
+    legacyMealSchema=true;
+    i.legacyJobLevelMealCandidate=i.paysMeal;
+    delete i.paysMeal;
+  }
+  i.verified=i.verified||{};
+  if(!Object.prototype.hasOwnProperty.call(i.verified,"weekdayMeal"))i.verified.weekdayMeal=false;
+  if(!Object.prototype.hasOwnProperty.call(i.verified,"weekendMeal"))i.verified.weekendMeal=false;
+  if(i.weekday.none)i.verified.weekdayMeal=true;
+  if(i.weekend.none)i.verified.weekendMeal=true;
+ });
+ x.schema="epl-crew-revision-verifier-v2";
+ x.revision=x.revision||{};
+ x.revision.mealSchema="per-period";
+ if(legacyMealSchema){
+   x.revision.migrationNote="Legacy job-level meal status was ambiguous and is not treated as authoritative. Verify weekday and weekend meal status separately.";
+   x.items.forEach(i=>{
+     if(i.type==="regular"&&(i.certification==="certified_correct"||i.certification==="corrected_and_certified")){
+       i.certification="needs_review";i.complete=false;i.certifiedAt=null;
+     }
+   });
+ }
+ return x;
+}
+function load(){try{const x=localStorage.getItem(KEY);if(x)return normalizeState(JSON.parse(x))}catch(e){}return normalizeState(fresh())}
 async function restoreFromIndexedDBIfNewer(){
   const raw=await idbReadState();if(!raw)return;
   try{
-    const candidate=JSON.parse(raw);
+    const candidate=normalizeState(JSON.parse(raw));
     const currentSaved=Number(state?._autosaveEpoch||0),candidateSaved=Number(candidate?._autosaveEpoch||0);
     if(candidateSaved>currentSaved){
       state=candidate;render();updateProgress();updatePreview();
@@ -326,16 +368,53 @@ function movementBuilder(idx,section,movements){
  return `<div class="movement-shell">${movements.length?movements.map((m,n)=>movementEditor(idx,section,n,m)).join(""):`<div class="empty">No assignment lines entered yet.</div>`}<div class="movement-tools"><button class="bluebtn" onclick="addMovement(${idx},'${section}','train')">+ Train</button><button class="secondary" onclick="addMovement(${idx},'${section}','deadhead')">+ Deadhead</button><button class="warnbtn" onclick="addMovement(${idx},'${section}','note')">+ Note</button></div></div>`
 }
 function exceptionEditor(idx,key,n,e){
- return `<div class="exception"><div class="xrow"><div><label class="lbl">Day / condition</label><input value="${esc(e.day||"")}" placeholder="Friday / Sundays only" oninput="setException(${idx},'${key}',${n},'day',this.value)"></div><div><label class="lbl">What differs?</label><select onchange="setException(${idx},'${key}',${n},'field',this.value)">${["Release","Report","Movement / service","Footnote","Multiple items"].map(x=>`<option ${e.field===x?'selected':''}>${x}</option>`).join("")}</select></div></div><div class="xrow" style="margin-top:8px"><div><label class="lbl">Override / details</label><input value="${esc(e.value||"")}" placeholder="12:53 AM / Train 8803 added…" oninput="setException(${idx},'${key}',${n},'value',this.value)"></div><div><label class="lbl">Date range</label><input value="${esc(e.range||"")}" placeholder="May 21–Sept. 3" oninput="setException(${idx},'${key}',${n},'range',this.value)"></div></div><div style="margin-top:8px"><label class="lbl">Clarifying note</label><input value="${esc(e.note||"")}" placeholder="Saturday report → Sunday after midnight" oninput="setException(${idx},'${key}',${n},'note',this.value)"></div><button class="dangerbtn smallbtn" style="margin-top:8px" onclick="removeException(${idx},'${key}',${n})">Remove exception</button></div>`
+ const mealOverride=e.mealOverride||"";
+ return `<div class="exception">
+  <div class="xrow">
+   <div><label class="lbl">Day / condition</label><input value="${esc(e.day||"")}" placeholder="Friday / Sundays only" oninput="setException(${idx},'${key}',${n},'day',this.value)"></div>
+   <div><label class="lbl">What differs?</label><select onchange="setException(${idx},'${key}',${n},'field',this.value)">${["Release","Report","Movement / service","Footnote","Multiple items"].map(x=>`<option ${e.field===x?'selected':''}>${x}</option>`).join("")}</select></div>
+  </div>
+  <div class="xrow" style="margin-top:8px">
+   <div><label class="lbl">Override / details</label><input value="${esc(e.value||"")}" placeholder="12:53 AM / Train 8803 added…" oninput="setException(${idx},'${key}',${n},'value',this.value)"></div>
+   <div><label class="lbl">Date range</label><input value="${esc(e.range||"")}" placeholder="May 21–Sept. 3" oninput="setException(${idx},'${key}',${n},'range',this.value)"></div>
+  </div>
+  <div style="margin-top:8px">
+   <label class="lbl">Meal status for this exception</label>
+   <select onchange="setException(${idx},'${key}',${n},'mealOverride',this.value)">
+    <option value="" ${!mealOverride?'selected':''}>No change from base portion</option>
+    <option value="yes" ${mealOverride==="yes"?'selected':''}>Pays meal</option>
+    <option value="no" ${mealOverride==="no"?'selected':''}>Does not pay meal</option>
+   </select>
+  </div>
+  <div style="margin-top:8px"><label class="lbl">Clarifying note</label><input value="${esc(e.note||"")}" placeholder="Saturday report → Sunday after midnight" oninput="setException(${idx},'${key}',${n},'note',this.value)"></div>
+  <button class="dangerbtn smallbtn" style="margin-top:8px" onclick="removeException(${idx},'${key}',${n})">Remove exception</button>
+ </div>`
 }
 function periodEditor(i,idx,key){
  const p=i[key]||blankPeriod(),none=!!p.none;
  const label=key==="weekday"?"No Monday–Friday portion":"No Saturday–Sunday portion";
- if(none)return `<div class="block"><label class="verifyitem checked"><input type="checkbox" checked onchange="setPeriodNone(${idx},'${key}',this.checked)"><span>${label}</span></label><div class="note">This portion is intentionally not applicable for this assignment.</div></div>`;
- return `<div class="block"><label class="verifyitem"><input type="checkbox" onchange="setPeriodNone(${idx},'${key}',this.checked)"><span>${label}</span></label><div class="grid2"><div><label class="lbl">Base report</label><input type="time" value="${esc(p.report)}" oninput="setPeriod(${idx},'${key}','report',this.value)"></div><div><label class="lbl">Base release</label><input type="time" value="${esc(p.release)}" oninput="setPeriod(${idx},'${key}','release',this.value)"></div></div><div class="section">Assignment lines — published order</div>${movementBuilder(idx,key,p.movements||[])}<div class="section">Day-specific / dated exceptions</div>${(p.exceptions||[]).map((e,n)=>exceptionEditor(idx,key,n,e)).join("")}<button class="secondary smallbtn" onclick="addException(${idx},'${key}')">+ Add exception</button></div>`
+ const mealLabel=key==="weekday"?"Monday–Friday pays meal?":"Saturday–Sunday pays meal?";
+ if(none)return `<div class="block"><label class="verifyitem checked"><input type="checkbox" checked onchange="setPeriodNone(${idx},'${key}',this.checked)"><span>${label}</span></label><div class="note">This portion is intentionally not applicable. Meal status for this portion is N/A.</div></div>`;
+ return `<div class="block">
+  <label class="verifyitem"><input type="checkbox" onchange="setPeriodNone(${idx},'${key}',this.checked)"><span>${label}</span></label>
+  <div class="grid2">
+   <div><label class="lbl">Base report</label><input type="time" value="${esc(p.report)}" oninput="setPeriod(${idx},'${key}','report',this.value)"></div>
+   <div><label class="lbl">Base release</label><input type="time" value="${esc(p.release)}" oninput="setPeriod(${idx},'${key}','release',this.value)"></div>
+  </div>
+  <div style="height:8px"></div>
+  <label class="lbl">${mealLabel}</label>
+  <select onchange="setPeriod(${idx},'${key}','paysMeal',this.value)">
+   <option value="" ${!p.paysMeal?'selected':''}>Select…</option>
+   <option value="yes" ${p.paysMeal==="yes"?'selected':''}>Yes</option>
+   <option value="no" ${p.paysMeal==="no"?'selected':''}>No</option>
+  </select>
+  <div class="section">Assignment lines — published order</div>${movementBuilder(idx,key,p.movements||[])}
+  <div class="section">Day-specific / dated exceptions</div>${(p.exceptions||[]).map((e,n)=>exceptionEditor(idx,key,n,e)).join("")}
+  <button class="secondary smallbtn" onclick="addException(${idx},'${key}')">+ Add exception</button>
+ </div>`
 }
 function regularEditor(i,idx){
- return `<div class="prefill"><div>◉</div><div><b>Current app candidate</b><br>This is the schedule behavior currently encoded in Engineer Pay Log (with known Job 200 correction pre-applied). Verify every field and every starred exception against the pinned source before certification.</div></div><div class="section" style="margin-top:0">Complete new assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Pays meal period?</label><select onchange="setVal(${idx},'paysMeal',this.value)"><option value="" ${!i.paysMeal?'selected':''}>Select…</option><option value="yes" ${i.paysMeal==="yes"?'selected':''}>Yes</option><option value="no" ${i.paysMeal==="no"?'selected':''}>No</option></select></div></div><div class="section">Relief days & who covers them</div><div class="coverage">${coverageEditor(i,idx,"relief1","Relief day #1")}${coverageEditor(i,idx,"relief2","Relief day #2")}</div><div class="section">Monday–Friday</div>${periodEditor(i,idx,"weekday")}<div class="section">Saturday–Sunday</div>${periodEditor(i,idx,"weekend")}<div class="section">Published footnotes / special date ranges</div><textarea oninput="setVal(${idx},'footnotes',this.value)" placeholder="Copy assignment-wide asterisk wording/date restrictions…">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)" placeholder="Saturday into Sunday release time; asterisk applies after midnight; anything you want me to understand…">${esc(i.notes)}</textarea><div class="note">Plain-language notes are intentional. You do not need to translate railroad wording into code rules.</div>${completeButton(i,idx)}`
+ return `<div class="prefill"><div>◉</div><div><b>Current app candidate</b><br>This is the schedule behavior currently encoded in Engineer Pay Log (with known Job 200 correction pre-applied). Verify every field and every starred exception against the pinned source before certification.</div></div><div class="section" style="margin-top:0">Complete new assignment</div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"><div class="section">Relief days & who covers them</div><div class="coverage">${coverageEditor(i,idx,"relief1","Relief day #1")}${coverageEditor(i,idx,"relief2","Relief day #2")}</div><div class="section">Monday–Friday</div>${periodEditor(i,idx,"weekday")}<div class="section">Saturday–Sunday</div>${periodEditor(i,idx,"weekend")}<div class="section">Published footnotes / special date ranges</div><textarea oninput="setVal(${idx},'footnotes',this.value)" placeholder="Copy assignment-wide asterisk wording/date restrictions…">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)" placeholder="Saturday into Sunday release time; asterisk applies after midnight; anything you want me to understand…">${esc(i.notes)}</textarea><div class="note">Plain-language notes are intentional. You do not need to translate railroad wording into code rules.</div>${completeButton(i,idx)}`
 }
 function extraEditor(i,idx){
  return `<div class="prefill"><div>◉</div><div><b>Current app candidate</b><br>This is the schedule behavior currently encoded in Engineer Pay Log (with known Job 200 correction pre-applied). Verify every field and every starred exception against the pinned source before certification.</div></div><div class="section" style="margin-top:0">Complete Extra Crew assignment</div><div class="grid2"><div><label class="lbl">Terminal / location</label><input value="${esc(i.terminal)}" oninput="setVal(${idx},'terminal',this.value)"></div><div><label class="lbl">Active days / date restrictions</label><input value="${esc(i.active)}" oninput="setVal(${idx},'active',this.value)"></div><div><label class="lbl">Report</label><input type="time" value="${esc(i.report)}" oninput="setVal(${idx},'report',this.value)"></div><div><label class="lbl">Release</label><input type="time" value="${esc(i.release)}" oninput="setVal(${idx},'release',this.value)"></div></div><div class="section">Assignment lines</div>${movementBuilder(idx,"movements",i.movements||[])}<div class="section">Footnotes / special dates</div><textarea oninput="setVal(${idx},'footnotes',this.value)">${esc(i.footnotes)}</textarea><div class="section">Notes for review</div><textarea oninput="setVal(${idx},'notes',this.value)">${esc(i.notes)}</textarea>${completeButton(i,idx)}`
@@ -352,7 +431,10 @@ function completeButton(i,idx){
   <div class="certcopy">Certification is locked until every verification box is checked, including train-number/day consistency. If you edited any prefilled field, use Corrected & Certified.</div>
   <div class="verifytitle">Verification checklist</div>
   <div class="verifylist">
-   ${VERIFY_LABELS.map(([k,l])=>`<label class="verifyitem ${i.verified?.[k]?'checked':''}"><input type="checkbox" ${i.verified?.[k]?'checked':''} onchange="setVerified(${idx},'${k}',this.checked)"><span>${esc(l)}</span></label>`).join('')}
+   ${VERIFY_LABELS.map(([k,l])=>{
+    const na=(k==="weekdayMeal"&&i.weekday?.none)||(k==="weekendMeal"&&i.weekend?.none);
+    return `<label class="verifyitem ${(i.verified?.[k]||na)?'checked':''}"><input type="checkbox" ${(i.verified?.[k]||na)?'checked':''} ${na?'disabled':''} onchange="setVerified(${idx},'${k}',this.checked)"><span>${esc(l)}${na?' — N/A':''}</span></label>`;
+   }).join('')}
   </div>
   <div class="certactions">
    <button class="primary" onclick="certify(${idx},'certified_correct')">✓ Certified Correct</button>
@@ -379,9 +461,12 @@ function setVal(idx,k,v){markCorrection(idx);state.items[idx][k]=v;save()} funct
 function setPeriod(idx,k,s,v){markCorrection(idx);state.items[idx][k][s]=v;save()}
 function setPeriodNone(idx,k,v){
   markCorrection(idx);
-  const p=state.items[idx][k]||(state.items[idx][k]=blankPeriod());
+  const i=state.items[idx],p=i[k]||(i[k]=blankPeriod());
   p.none=!!v;
-  if(v){p.report="";p.release="";p.movements=[];p.exceptions=[]}
+  if(!i.verified)i.verified={};
+  const mealKey=k==="weekday"?"weekdayMeal":"weekendMeal";
+  if(v){p.report="";p.release="";p.paysMeal="";p.movements=[];p.exceptions=[];i.verified[mealKey]=true}
+  else{i.verified[mealKey]=false}
   save(true);render();reopen(idx);
 }
 function setWeek(idx,d,v){markCorrection(idx);state.items[idx].week[d]=v;save()}
@@ -391,22 +476,32 @@ function addMovement(idx,section,type){markCorrection(idx);getMoveArray(idx,sect
 function removeMovement(idx,section,n){markCorrection(idx);getMoveArray(idx,section).splice(n,1);save();render();reopen(idx)}
 function moveLine(idx,section,n,d){markCorrection(idx);const a=getMoveArray(idx,section),to=n+d;if(to<0||to>=a.length)return;[a[n],a[to]]=[a[to],a[n]];save();render();reopen(idx)}
 function setMovement(idx,section,n,k,v){markCorrection(idx);getMoveArray(idx,section)[n][k]=v;save()}
-function addException(idx,k){markCorrection(idx);state.items[idx][k].exceptions.push({day:"",field:"Release",value:"",range:"",note:""});save();render();reopen(idx)}
+function addException(idx,k){markCorrection(idx);state.items[idx][k].exceptions.push({day:"",field:"Release",value:"",range:"",mealOverride:"",note:""});save();render();reopen(idx)}
 function removeException(idx,k,n){markCorrection(idx);state.items[idx][k].exceptions.splice(n,1);save();render();reopen(idx)}
 function setException(idx,k,n,f,v){markCorrection(idx);state.items[idx][k].exceptions[n][f]=v;save()}
 function toggleComplete(idx){state.items[idx].complete=!state.items[idx].complete;save(true);render()}
 function certify(idx,status){const i=state.items[idx];
+  if(status!=="needs_review"&&i.type==="regular"){
+    const mealMissing=[];
+    if(!i.weekday?.none&&!["yes","no"].includes(i.weekday?.paysMeal||""))mealMissing.push("Monday–Friday meal status");
+    if(!i.weekend?.none&&!["yes","no"].includes(i.weekend?.paysMeal||""))mealMissing.push("Saturday–Sunday meal status");
+    if(mealMissing.length){alert("Select the meal status first:\n\n"+mealMissing.map(x=>"• "+x).join("\n"));return}
+  }
   if(status!=="needs_review"&&i.verified){
-    const missing=VERIFY_LABELS.filter(([k])=>Object.prototype.hasOwnProperty.call(i.verified,k)&&!i.verified[k]).map(([,l])=>l);
+    const missing=VERIFY_LABELS.filter(([k])=>{
+      if(k==="weekdayMeal"&&i.weekday?.none)return false;
+      if(k==="weekendMeal"&&i.weekend?.none)return false;
+      return !i.verified[k];
+    }).map(([,l])=>l);
     if(missing.length){alert("Finish the verification checklist first:\n\n"+missing.map(x=>"• "+x).join("\n"));return}
   }
   i.certification=status;i.complete=status!=="needs_review";i.certifiedAt=i.complete?new Date().toISOString():null;if(status==="corrected_and_certified")i.userCorrections=true;save(true);render();reopen(idx)}
 function setRevision(k,v){state.revision[k]=v;save()} function setGeneralNotes(v){state.revision.generalNotes=v;save()}
 function updateProgress(){const n=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length,t=state.items.length;document.getElementById("progressText").textContent=`${n} of ${t} certified`;document.getElementById("progressBar").style.width=(n/t*100)+"%"}
-function exportData(){const certified=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length;return{...state,certificationSummary:{certified,total:state.items.length,allCertified:certified===state.items.length},exportedAt:new Date().toISOString(),handoffNote:"Hybrid assistant-prefill + human-certification handoff. Every certified job was compared by the user against its pinned official Crew Book source. Structured train records preserve Crew Equipment Move Notes (c/t/v/w/y). The structured assignment in this JSON is the human-verified record for patch generation."}}
+function exportData(){const certified=state.items.filter(x=>x.certification==="certified_correct"||x.certification==="corrected_and_certified").length;state.schema="epl-crew-revision-verifier-v2";state.revision.mealSchema="per-period";return{...state,certificationSummary:{certified,total:state.items.length,allCertified:certified===state.items.length},exportedAt:new Date().toISOString(),handoffNote:"Hybrid assistant-prefill + human-certification handoff. Every certified job was compared by the user against its pinned official Crew Book source. Structured train records preserve Crew Equipment Move Notes (c/t/v/w/y). Meal status is certified separately under weekday.paysMeal and weekend.paysMeal; none=true means N/A. Day/date exceptions may carry mealOverride values yes/no/blank. The structured assignment in this JSON is the human-verified record for patch generation."}}
 function updatePreview(){document.getElementById("preview").textContent=JSON.stringify(exportData(),null,2)}
 function exportJson(){const b=new Blob([JSON.stringify(exportData(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`Crew_Book_GO${state.revision.go}_Rev${state.revision.revision}_EXCEPTION_RECERT_progress.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("JSON backup exported")}
-function importJson(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw 0;state={schema:x.schema||"epl-crew-revision-verifier-v1",revision:x.revision,items:x.items};localStorage.setItem(KEY,JSON.stringify(state));syncHeader();render();updateProgress();updatePreview();toast("Backup imported")}catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};r.readAsText(file);document.getElementById("importFile").value=""}
+function importJson(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.items)||!x.revision)throw 0;const wasLegacy=x.schema!=="epl-crew-revision-verifier-v2"||x.items.some(i=>i.type==="regular"&&Object.prototype.hasOwnProperty.call(i,"paysMeal"));state=normalizeState({schema:x.schema||"epl-crew-revision-verifier-v1",revision:x.revision,items:x.items});save(false);syncHeader();render();updateProgress();updatePreview();if(wasLegacy)alert("Imported successfully.\n\nThe old verifier had one meal field per job. All other work was preserved, but regular jobs were returned to Needs Review so weekday and weekend meal status can be verified separately.");else toast("Backup imported")}catch(e){alert("That file does not look like a Crew Book Revision Builder backup.")}};r.readAsText(file);document.getElementById("importFile").value=""}
 function resetDemo(){if(!confirm("Reset all entries stored on this device?"))return;state=fresh();sourceUI={};localStorage.removeItem(KEY);syncHeader();render();updateProgress();updatePreview();toast("Builder reset")}
 function syncHeader(){document.getElementById("go").value=state.revision.go||"";document.getElementById("rev").value=state.revision.revision||"";document.getElementById("eff").value=state.revision.effective||"";document.getElementById("generalNotes").value=state.revision.generalNotes||""}
 function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
