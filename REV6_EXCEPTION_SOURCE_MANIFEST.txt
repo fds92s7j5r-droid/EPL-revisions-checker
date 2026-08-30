@@ -1,0 +1,65 @@
+GO 201 REVISION 6 EXCEPTION RE-CERTIFICATION - SOURCE MANIFEST
+
+Priority explicit Friday-only cases:
+9, 12, 51, 134, 161, 200, 216, 293, 358
+
+All 56 current custom-resolver jobs:
+1, 2, 9, 10, 12, 13, 14, 17, 18, 32, 38, 42, 43, 47, 51, 52, 53, 100, 104, 109, 112, 113, 127, 134, 138, 161, 170, 178, 179, 181, 182, 191, 199, 200, 216, 233, 241, 243, 271, 273, 275, 277, 285, 286, 289, 293, 311, 312, 324, 328, 333, 334, 352, 354, 356, 358
+
+Job -> pinned source image
+9 -> assets/page_010.jpg
+12 -> assets/page_011.jpg
+51 -> assets/page_024.jpg
+134 -> assets/page_056.jpg
+161 -> assets/page_066.jpg
+200 -> assets/page_087.jpg
+216 -> assets/page_089.jpg
+293 -> assets/page_116.jpg
+358 -> assets/page_141.jpg
+1 -> assets/page_006.jpg
+2 -> assets/page_006.jpg
+10 -> assets/page_010.jpg
+13 -> assets/page_012.jpg
+14 -> assets/page_013.jpg
+17 -> assets/page_014.jpg
+18 -> assets/page_014.jpg
+32 -> assets/page_017.jpg
+38 -> assets/page_019.jpg
+42 -> assets/page_021.jpg
+43 -> assets/page_021.jpg
+47 -> assets/page_023.jpg
+52 -> assets/page_025.jpg
+53 -> assets/page_025.jpg
+100 -> assets/page_039.jpg
+104 -> assets/page_042.jpg
+109 -> assets/page_046.jpg
+112 -> assets/page_048.jpg
+113 -> assets/page_048.jpg
+127 -> assets/page_053.jpg
+138 -> assets/page_058.jpg
+170 -> assets/page_070.jpg
+178 -> assets/page_075.jpg
+179 -> assets/page_076.jpg
+181 -> assets/page_078.jpg
+182 -> assets/page_079.jpg
+191 -> assets/page_081.jpg
+199 -> assets/page_086.jpg
+233 -> assets/page_093.jpg
+241 -> assets/page_097.jpg
+243 -> assets/page_098.jpg
+271 -> assets/page_107.jpg
+273 -> assets/page_109.jpg
+275 -> assets/page_111.jpg
+277 -> assets/page_112.jpg
+285 -> assets/page_113.jpg
+286 -> assets/page_113.jpg
+289 -> assets/page_114.jpg
+311 -> assets/page_122.jpg
+312 -> assets/page_122.jpg
+324 -> assets/page_127.jpg
+328 -> assets/page_130.jpg
+333 -> assets/page_131.jpg
+334 -> assets/page_132.jpg
+352 -> assets/page_138.jpg
+354 -> assets/page_139.jpg
+356 -> assets/page_140.jpg
