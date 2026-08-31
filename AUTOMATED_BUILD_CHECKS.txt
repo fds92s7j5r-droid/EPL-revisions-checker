@@ -1,0 +1,14 @@
+GO 202 Rev. 7 Delta Verifier — Automated Build Checks
+
+Manifest cards: 173
+- revised: 170
+- added: 203, 329
+- abolished: 18
+Rev. 6 human-certified overlap among revised jobs: 36
+Job-specific source crops: 173
+Structured report/release values compared against unambiguous extracted official-source times: 547
+Detected base-time mismatches in those comparisons: 0
+Duplicate item IDs: 0
+Missing/empty source crops: 0
+
+Result: PASS
